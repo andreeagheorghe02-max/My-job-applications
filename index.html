@@ -1,109 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Job Applications</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #f7f8fa;
+      --card: #ffffff;
+      --text: #111111;
+      --text-2: #666666;
+      --text-3: #999999;
+      --border: rgba(0,0,0,0.08);
+      --border-2: rgba(0,0,0,0.14);
+      --hover-row: #f2f4f7;
+      --input-bg: #f7f8fa;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+    .container { max-width: 1100px; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
 
-<style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  background: #f7f8fa;
-}
-  .dash { padding: 1rem 0; }
-  .top-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 12px; }
-  .top-bar h1 { font-size: 22px; font-weight: 600; color: var(--color-text-primary); }
-  .metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin-bottom: 1.5rem; }
-  .metric {
-  background: var(--color-background-primary);
-  border-radius: 12px;
-  padding: 1.2rem;
-  border: 1px solid rgba(0,0,0,0.05);
-  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-}
-  .metric-label { font-size: 12px; color: var(--color-text-secondary); margin-bottom: 4px; }
-  .metric-value { font-size: 22px; font-weight: 500; color: var(--color-text-primary); }
-  .metric-sub { font-size: 11px; color: var(--color-text-tertiary); margin-top: 2px; }
-  .charts {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-  margin-bottom: 2rem;
-}
-  .chart-card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem 1.25rem; }
-  .chart-title { font-size: 13px; font-weight: 500; color: var(--color-text-secondary); margin-bottom: 12px; }
-  .controls { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 1rem; align-items: center; }
-  .filter-btn { font-size: 12px; padding: 5px 12px; border-radius: var(--border-radius-md); border: 0.5px solid var(--color-border-secondary); background: var(--color-background-primary); color: var(--color-text-secondary); cursor: pointer; transition: all 0.15s; }
-  .filter-btn.active { background: #185FA5; color: #E6F1FB; border-color: #185FA5; }
-  .filter-btn:hover:not(.active) { background: var(--color-background-secondary); }
-  .add-btn { margin-left: auto; font-size: 13px; padding: 6px 14px; border-radius: var(--border-radius-md); border: 0.5px solid var(--color-border-secondary); background: var(--color-background-primary); color: var(--color-text-primary); cursor: pointer; font-weight: 500; }
-  .add-btn:hover { background: var(--color-background-secondary); }
-  table { width: 100%; border-collapse: collapse; font-size: 13px; table-layout: fixed; }
-  th { text-align: left; font-size: 11px; font-weight: 500; color: var(--color-text-tertiary); padding: 6px 8px; border-bottom: 0.5px solid var(--color-border-tertiary); letter-spacing: 0.04em; }
-  td { padding: 8px 8px; border-bottom: 0.5px solid var(--color-border-tertiary); color: var(--color-text-primary); vertical-align: middle; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  tr:last-child td { border-bottom: none; }
-  tr:hover td {
-  background: #f2f4f7;
-}
-  .badge { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 99px; font-weight: 500; }
-  .b-applied { background: #E6F1FB; color: #0C447C; }
-  .b-reply { background: #EAF3DE; color: #27500A; }
-  .b-interview { background: #FAEEDA; color: #633806; }
-  .b-offer { background: #E1F5EE; color: #085041; }
-  .b-rejected { background: #FCEBEB; color: #791F1F; }
-  .b-ghosted { background: #F1EFE8; color: #444441; }
-  .b-closed { background: #FBEAF0; color: #72243E; }
-  .bool-icon { font-size: 14px; }
-  .uwv-flag { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; }
-  .uwv-dot { width: 7px; height: 7px; border-radius: 50%; }
-  .uwv-ok { background: #639922; }
-  .uwv-due { background: #EF9F27; }
-  .uwv-overdue { background: #E24B4A; }
-  .modal-bg { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.55); z-index: 100; align-items: center; justify-content: center; }
-.modal-bg.open { display: flex; }
-.modal { background: #ffffff; border-radius: 14px; border: none; box-shadow: 0 8px 32px rgba(0,0,0,0.18); padding: 1.75rem; width: 100%; max-width: 480px; max-height: 90vh; overflow-y: auto; }
-  .modal h2 { font-size: 16px; font-weight: 500; margin-bottom: 1rem; }
-  .form-row { margin-bottom: 12px; }
-  .form-row label { display: block; font-size: 12px; color: var(--color-text-secondary); margin-bottom: 4px; }
-  .form-row input, .form-row select { width: 100%; padding: 7px 10px; font-size: 13px; border-radius: var(--border-radius-md); border: 1px solid #ddd; background: #f7f8fa; color: #111; }
-  .form-row input[type=checkbox] { width: auto; }
-  .form-check { display: flex; align-items: center; gap: 8px; font-size: 13px; }
-  .modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 1rem; }
-  .btn-save { font-size: 13px; padding: 7px 16px; border-radius: var(--border-radius-md); border: none; background: #185FA5; color: #E6F1FB; cursor: pointer; font-weight: 500; }
-  .btn-cancel { font-size: 13px; padding: 7px 16px; border-radius: var(--border-radius-md); border: 0.5px solid var(--color-border-secondary); background: transparent; color: var(--color-text-primary); cursor: pointer; }
-  .empty { text-align: center; padding: 2rem; color: var(--color-text-tertiary); font-size: 13px; }
-  @media (max-width: 600px) { .charts { grid-template-columns: 1fr; } }
-  .table-wrap {
-  background: var(--color-background-primary);
-  border-radius: 12px;
-  overflow: hidden;
-  border: 1px solid rgba(0,0,0,0.06);
-}
-  .col-company { width: 18%; }
-  .col-role { width: 18%; }
-  .col-industry { width: 12%; }
-  .col-date { width: 10%; }
-  .col-cover { width: 7%; text-align: center; }
-  .col-status { width: 13%; }
-  .col-uwv { width: 13%; }
-  .col-notes { width: 9%; }
-button {
-  transition: all 0.15s ease;
-}
-button:hover {
-  transform: translateY(-1px);
-}
-  .btn-delete { font-size: 13px; padding: 7px 16px; border-radius: var(--border-radius-md); border: 0.5px solid #E24B4A; background: transparent; color: #E24B4A; cursor: pointer; margin-right: auto; }
-.btn-delete:hover { background: #FCEBEB; }
-.action-item { display:flex; align-items:center; gap:10px; padding:7px 10px; margin-bottom:5px; background:var(--color-background-secondary); border-radius:8px; }
-.action-item.done { opacity:0.4; text-decoration:line-through; }
-.action-item input[type=checkbox] { width:auto; margin:0; cursor:pointer; }
-.b-radar { background: #EEEDFE; color: #3C3489; }
-</style>
+    /* Top bar */
+    .top-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 12px; }
+    .top-bar h1 { font-size: 22px; font-weight: 600; }
+    .top-bar-right { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    #syncStatus { font-size: 11px; color: var(--text-3); }
 
-<div class="dash">
-  <div class="top-bar">
-    <h1>My Job Applications</h1>
-    <button class="add-btn" onclick="openModal()">+ Add application</button>
+    /* Buttons */
+    button { transition: all 0.15s ease; cursor: pointer; font-family: inherit; }
+    button:hover { transform: translateY(-1px); }
+    .add-btn { font-size: 13px; padding: 7px 14px; border-radius: var(--radius-md); border: 0.5px solid var(--border-2); background: var(--card); color: var(--text); font-weight: 500; }
+    .add-btn:hover { background: #f0f1f3; }
+    .export-btn { font-size: 12px; padding: 6px 12px; border-radius: var(--radius-md); border: 0.5px solid var(--border-2); background: transparent; color: var(--text-2); }
+    .export-btn:hover { background: #f0f1f3; }
+
+    /* Metrics */
+    .metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin-bottom: 1.5rem; }
+    .metric { background: var(--card); border-radius: var(--radius-lg); padding: 1.2rem; border: 1px solid var(--border); }
+    .metric-label { font-size: 12px; color: var(--text-2); margin-bottom: 4px; }
+    .metric-value { font-size: 22px; font-weight: 500; }
+    .metric-sub { font-size: 11px; color: var(--text-3); margin-top: 2px; }
+
+    /* Charts */
+    .charts { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 1rem; }
+    .chart-card { background: var(--card); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 1rem 1.25rem; }
+    .chart-title { font-size: 13px; font-weight: 500; color: var(--text-2); margin-bottom: 12px; }
+    @media (max-width: 600px) { .charts { grid-template-columns: 1fr; } }
+
+    /* Actions panel */
+    .actions-panel { background: var(--card); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 1rem 1.25rem; margin-top: 1rem; margin-bottom: 1rem; }
+    .actions-header { display: flex; align-items: center; justify-content: space-between; cursor: pointer; }
+    .actions-badge { font-size: 11px; background: #E6F1FB; color: #0C447C; padding: 2px 8px; border-radius: 99px; margin-left: 6px; }
+    .action-item { display: flex; align-items: center; gap: 10px; padding: 7px 10px; margin-bottom: 5px; background: var(--bg); border-radius: 8px; font-size: 13px; }
+    .action-item.done { opacity: 0.4; text-decoration: line-through; }
+    .action-item input[type=checkbox] { width: auto; margin: 0; cursor: pointer; }
+
+    /* Controls */
+    .controls { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 1rem; align-items: center; }
+    .filter-btn { font-size: 12px; padding: 5px 12px; border-radius: var(--radius-md); border: 0.5px solid var(--border-2); background: var(--card); color: var(--text-2); }
+    .filter-btn.active { background: #185FA5; color: #E6F1FB; border-color: #185FA5; }
+    .filter-btn:hover:not(.active) { background: #f0f1f3; }
+
+    /* Table */
+    .table-wrap { background: var(--card); border-radius: var(--radius-lg); overflow: hidden; border: 1px solid var(--border); }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; table-layout: fixed; }
+    th { text-align: left; font-size: 11px; font-weight: 500; color: var(--text-3); padding: 8px 10px; border-bottom: 0.5px solid var(--border); letter-spacing: 0.04em; }
+    td { padding: 9px 10px; border-bottom: 0.5px solid var(--border); vertical-align: middle; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: var(--hover-row); cursor: pointer; }
+    .empty { text-align: center; padding: 2.5rem; color: var(--text-3); font-size: 13px; display: none; }
+
+    /* Badges */
+    .badge { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 99px; font-weight: 500; }
+    .b-radar    { background: #EEEDFE; color: #3C3489; }
+    .b-applied  { background: #E6F1FB; color: #0C447C; }
+    .b-reply    { background: #EAF3DE; color: #27500A; }
+    .b-interview{ background: #FAEEDA; color: #633806; }
+    .b-offer    { background: #E1F5EE; color: #085041; }
+    .b-ghosted  { background: #F1EFE8; color: #444441; }
+    .b-closed   { background: #FBEAF0; color: #72243E; }
+
+    /* Deadline indicator */
+    .dl-flag { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; }
+    .dl-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+    .dl-ok      { background: #639922; }
+    .dl-due     { background: #EF9F27; }
+    .dl-overdue { background: #E24B4A; }
+
+    /* Modal */
+    .modal-bg { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; align-items: center; justify-content: center; }
+    .modal-bg.open { display: flex; }
+    .modal { background: var(--card); border-radius: 14px; box-shadow: 0 8px 40px rgba(0,0,0,0.18); padding: 1.75rem; width: 100%; max-width: 480px; max-height: 90vh; overflow-y: auto; }
+    .modal h2 { font-size: 16px; font-weight: 500; margin-bottom: 1.25rem; }
+    .form-row { margin-bottom: 13px; }
+    .form-row label { display: block; font-size: 12px; color: var(--text-2); margin-bottom: 4px; }
+    .form-row input, .form-row select {
+      width: 100%; padding: 8px 10px; font-size: 13px;
+      border-radius: var(--radius-md); border: 1px solid var(--border-2);
+      background: var(--input-bg); color: var(--text); font-family: inherit;
+    }
+    .form-row input:focus, .form-row select:focus { outline: 2px solid #185FA5; outline-offset: 1px; }
+    .form-check { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+    .form-check input[type=checkbox] { width: auto; }
+    .modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 1.25rem; }
+    .btn-save   { font-size: 13px; padding: 7px 18px; border-radius: var(--radius-md); border: none; background: #185FA5; color: #E6F1FB; font-weight: 500; }
+    .btn-cancel { font-size: 13px; padding: 7px 14px; border-radius: var(--radius-md); border: 0.5px solid var(--border-2); background: transparent; color: var(--text); }
+    .btn-delete { font-size: 13px; padding: 7px 14px; border-radius: var(--radius-md); border: 0.5px solid #E24B4A; background: transparent; color: #E24B4A; margin-right: auto; }
+    .btn-delete:hover { background: #FCEBEB; }
+    .form-section { font-size: 11px; font-weight: 600; letter-spacing: 0.06em; color: var(--text-3); text-transform: uppercase; margin: 16px 0 10px; border-top: 0.5px solid var(--border); padding-top: 14px; }
+
+    /* JSONBin config panel */
+    .config-panel { background: #FFF8E6; border: 1px solid #FAC775; border-radius: var(--radius-lg); padding: 1rem 1.25rem; margin-bottom: 1.25rem; font-size: 13px; }
+    .config-panel strong { color: #633806; }
+    .config-panel input { margin-top: 6px; width: 100%; padding: 6px 9px; font-size: 12px; border-radius: 6px; border: 1px solid #FAC775; background: #fff; font-family: monospace; }
+    .config-panel .cfg-row { margin-top: 8px; }
+    .config-panel label { font-size: 12px; color: #633806; display: block; margin-bottom: 3px; }
+    .cfg-actions { display: flex; gap: 8px; margin-top: 10px; }
+    .cfg-save-btn { font-size: 12px; padding: 5px 12px; border-radius: 6px; border: none; background: #185FA5; color: white; }
+    .cfg-dismiss-btn { font-size: 12px; padding: 5px 12px; border-radius: 6px; border: 0.5px solid var(--border-2); background: transparent; color: var(--text-2); }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <!-- Config panel (shown when no JSONBin is set up) -->
+  <div class="config-panel" id="configPanel">
+    <strong>&#9729; Optional: sync data to the cloud (JSONBin.io)</strong>
+    <p style="margin-top:5px; color:#633806;">Without this, data is saved in this browser only. To sync across devices or make it public, create a free bin at <a href="https://jsonbin.io" target="_blank" style="color:#185FA5;">jsonbin.io</a>, then paste your details below.</p>
+    <div class="cfg-row"><label>JSONBin Bin ID</label><input id="cfgBinId" placeholder="e.g. 6619f3a5acd3cb34a83d1234" /></div>
+    <div class="cfg-row"><label>JSONBin API Key (X-Master-Key)</label><input id="cfgApiKey" placeholder="$2a$10$..." /></div>
+    <div class="cfg-actions">
+      <button class="cfg-save-btn" onclick="saveConfig()">Save &amp; sync</button>
+      <button class="cfg-dismiss-btn" onclick="dismissConfig()">Use local storage only</button>
+    </div>
   </div>
 
+  <!-- Top bar -->
+  <div class="top-bar">
+    <h1>My job applications</h1>
+    <div class="top-bar-right">
+      <span id="syncStatus"></span>
+      <button class="export-btn" onclick="exportData()">&#8595; Export JSON</button>
+      <button class="add-btn" onclick="openModal()">+ Add application</button>
+    </div>
+  </div>
+
+  <!-- Metrics -->
   <div class="metrics" id="metrics"></div>
 
+  <!-- Charts -->
   <div class="charts">
     <div class="chart-card">
       <div class="chart-title">Status breakdown</div>
@@ -114,336 +167,425 @@ button:hover {
       <div style="position:relative;height:180px;"><canvas id="industryChart"></canvas></div>
     </div>
   </div>
-  <div class="chart-card" style="margin-top:1rem;">
-  <div style="display:flex; align-items:center; justify-content:space-between; cursor:pointer;" onclick="toggleActions()">
-    <span class="chart-title" style="margin-bottom:0;">Next actions <span id="actionsBadge" style="font-size:11px; background:#E6F1FB; color:#0C447C; padding:2px 8px; border-radius:99px; margin-left:6px;"></span></span>
-    <span id="actionsToggleIcon" style="font-size:13px; color:var(--color-text-secondary);">v</span>
+
+  <!-- Actions -->
+  <div class="actions-panel">
+    <div class="actions-header" onclick="toggleActions()">
+      <span style="font-size:13px;font-weight:500;color:var(--text-2);">
+        Next actions
+        <span class="actions-badge" id="actionsBadge"></span>
+      </span>
+      <span id="actionsToggleIcon" style="font-size:13px;color:var(--text-3);">&#9660;</span>
+    </div>
+    <div id="actionsList" style="margin-top:10px;"></div>
   </div>
-  <div id="actionsList" style="font-size:13px; color:var(--color-text-secondary); margin-top:10px;"></div>
-  </div>
-  <div class="controls" id="filters">
-   <button class="filter-btn active" data-filter="all" onclick="setFilter('all',this)">All</button>
-<button class="filter-btn" data-filter="On my radar" onclick="setFilter('On my radar',this)">On my radar</button>
-<button class="filter-btn" data-filter="Sent" onclick="setFilter('Sent',this)">Sent</button>
-<button class="filter-btn" data-filter="Talking" onclick="setFilter('Talking',this)">Talking</button>
-<button class="filter-btn" data-filter="Meeting" onclick="setFilter('Meeting',this)">Meeting</button>
-<button class="filter-btn" data-filter="Offer" onclick="setFilter('Offer',this)">Offer</button>
-<button class="filter-btn" data-filter="Ghosted" onclick="setFilter('Ghosted',this)">Ghosted</button>
-<button class="filter-btn" data-filter="Closed" onclick="setFilter('Closed',this)">Closed</button>
+
+  <!-- Filters -->
+  <div class="controls">
+    <button class="filter-btn active" onclick="setFilter('all',this)">All</button>
+    <button class="filter-btn" onclick="setFilter('On my radar',this)">On my radar</button>
+    <button class="filter-btn" onclick="setFilter('Sent',this)">Sent</button>
+    <button class="filter-btn" onclick="setFilter('Talking',this)">Talking</button>
+    <button class="filter-btn" onclick="setFilter('Meeting',this)">Meeting</button>
+    <button class="filter-btn" onclick="setFilter('Offer',this)">Offer</button>
+    <button class="filter-btn" onclick="setFilter('Ghosted',this)">Ghosted</button>
+    <button class="filter-btn" onclick="setFilter('Closed',this)">Closed</button>
     <button class="add-btn" onclick="openModal()" style="margin-left:auto;">+ Add</button>
   </div>
 
+  <!-- Table -->
   <div class="table-wrap">
     <table>
       <thead>
         <tr>
-          <th class="col-company">Company</th>
-          <th class="col-role">Role</th>
-          <th class="col-industry">Industry</th>
-          <th class="col-date">Applied</th>
-          <th class="col-cover">CL</th>
-          <th class="col-status">Status</th>
-          <th class="col-uwv">UWV deadline</th>
-          <th class="col-notes">Notes</th>
+          <th style="width:17%">Company</th>
+          <th style="width:18%">Role</th>
+          <th style="width:13%">Industry</th>
+          <th style="width:10%">Applied</th>
+          <th style="width:7%;text-align:center">CL</th>
+          <th style="width:12%">Status</th>
+          <th style="width:14%">App. deadline</th>
+          <th style="width:9%">Notes</th>
         </tr>
       </thead>
       <tbody id="tableBody"></tbody>
     </table>
-    <div id="emptyState" class="empty" style="display:none;">No applications yet &mdash; add your first one!</div>
+    <div class="empty" id="emptyState">No applications yet — add your first one!</div>
   </div>
+
 </div>
 
+<!-- Modal -->
 <div class="modal-bg" id="modalBg">
   <div class="modal">
     <h2 id="modalTitle">Add application</h2>
+
     <div class="form-row"><label>Company</label><input id="fCompany" placeholder="e.g. ASML" /></div>
     <div class="form-row"><label>Role</label><input id="fRole" placeholder="e.g. Data Analyst" /></div>
-    <div class="form-row"><label>Industry</label>
+    <div class="form-row">
+      <label>Industry</label>
       <select id="fIndustry">
-  <option value="">Select industry</option>
-  <option>Pharma & Biotech</option>
-  <option>Chemical Manufacturing</option>
-  <option>Research & Academia</option>
-  <option>Regulatory Affairs</option>
-  <option>Quality, Safety & HSE</option>
-  <option>Medical Devices & Diagnostics</option>
-  <option>Food, Flavour & Agriculture</option>
-  <option>Environmental & Sustainability</option>
-  <option>Materials & Nanotechnology</option>
-  <option>Energy & Clean Tech</option>
-  <option>Academic Publishing & Editorial</option>
-  <option>Science Communication & Media</option>
-  <option>Scientific Sales & Business Dev</option>
-  <option>Intellectual Property & Patents</option>
-  <option>Consultancy</option>
-  <option>Government & Public Sector</option>
-  <option>Other</option>
-</select>
+        <option value="">Select industry</option>
+        <option>Pharma &amp; Biotech</option>
+        <option>Chemical Manufacturing</option>
+        <option>Research &amp; Academia</option>
+        <option>Regulatory Affairs</option>
+        <option>Quality, Safety &amp; HSE</option>
+        <option>Medical Devices &amp; Diagnostics</option>
+        <option>Food, Flavour &amp; Agriculture</option>
+        <option>Environmental &amp; Sustainability</option>
+        <option>Materials &amp; Nanotechnology</option>
+        <option>Energy &amp; Clean Tech</option>
+        <option>Academic Publishing &amp; Editorial</option>
+        <option>Science Communication &amp; Media</option>
+        <option>Scientific Sales &amp; Business Dev</option>
+        <option>Intellectual Property &amp; Patents</option>
+        <option>Consultancy</option>
+        <option>Government &amp; Public Sector</option>
+        <option>Other</option>
+      </select>
     </div>
     <div class="form-row"><label>Date applied</label><input type="date" id="fDate" /></div>
-    <div class="form-row"><label>Status</label>
+    <div class="form-row"><label>Application deadline</label><input type="date" id="fDeadline" /></div>
+    <div class="form-row">
+      <label>Status</label>
       <select id="fStatus">
-  <option>On my radar</option><option>Sent</option><option>Talking</option><option>Meeting</option>
-  <option>Offer</option><option>Ghosted</option><option>Closed</option>
-</select>
+        <option>On my radar</option>
+        <option>Sent</option>
+        <option>Talking</option>
+        <option>Meeting</option>
+        <option>Offer</option>
+        <option>Ghosted</option>
+        <option>Closed</option>
+      </select>
     </div>
+
+    <div class="form-section">Extras</div>
     <div class="form-row">
       <div class="form-check"><input type="checkbox" id="fCover" /><label for="fCover">Sent cover letter</label></div>
     </div>
     <div class="form-row">
       <div class="form-check"><input type="checkbox" id="fUwvLogged" /><label for="fUwvLogged">Logged with UWV</label></div>
     </div>
-    <div class="form-row"><label>UWV deadline</label><input type="date" id="fUwvDeadline" /></div>
     <div class="form-row"><label>Notes</label><input id="fNotes" placeholder="Optional notes" /></div>
+
     <div class="modal-actions">
-  <button class="btn-delete" id="btnDelete" style="display:none;" onclick="deleteApp(editId)">Delete</button>
-  <button class="btn-cancel" onclick="closeModal()">Cancel</button>
-  <button class="btn-save" onclick="saveApp()">Save</button>
-</div>
+      <button class="btn-delete" id="btnDelete" style="display:none;" onclick="deleteApp(editId)">Delete</button>
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-save" onclick="saveApp()">Save</button>
+    </div>
   </div>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script>
-let apps = JSON.parse(localStorage.getItem('jobApps') || '[]');
-if (!apps.length) {
-  apps = [
-    { id:1, company:'Booking.com', role:'Product Analyst', industry:'Tech', date:'2026-03-01', cover:true, status:'Interview', uwvLogged:true, uwvDeadline:'2026-03-28', notes:'2nd round next week' },
-    { id:2, company:'ING Bank', role:'Data Engineer', industry:'Finance', date:'2026-03-05', cover:false, status:'Applied', uwvLogged:false, uwvDeadline:'2026-04-05', notes:' ' },
-    { id:3, company:'NS', role:'UX Designer', industry:'Logistics', date:'2026-02-20', cover:true, status:'Rejected', uwvLogged:true, uwvDeadline:'2026-03-22', notes:'Good feedback' },
-    { id:4, company:'Philips', role:'Business Analyst', industry:'Healthcare', date:'2026-03-10', cover:true, status:'Reply', uwvLogged:false, uwvDeadline:'2026-04-10', notes:' ' },
-    { id:5, company:'ASML', role:'IT Project Manager', industry:'Tech', date:'2026-03-15', cover:false, status:'Ghosted', uwvLogged:false, uwvDeadline:'2026-04-15', notes:' ' },
-  ];
-}
+  // ─── CONFIG ──────────────────────────────────────────────────────────────────
+  // Fill these in, or use the yellow panel above to set them via the UI.
+  // Get a free API key + bin ID at https://jsonbin.io
+  const JSONBIN_BASE = 'https://api.jsonbin.io/v3/b';
+  let BIN_ID  = localStorage.getItem('jt_bin_id')  || '';
+  let API_KEY = localStorage.getItem('jt_api_key') || '';
+  // ─────────────────────────────────────────────────────────────────────────────
 
-let currentFilter = 'all';
-let editId = null;
-let statusChart, industryChart;
-let actionsDismissed = JSON.parse(localStorage.getItem('actionsDismissed') || '[]');
-let actionsOpen = true;
-const STATUS_COLORS = {
-  'On my radar':'#7F77DD', Sent:'#378ADD', Talking:'#639922', Meeting:'#EF9F27',
-  Offer:'#1D9E75', Ghosted:'#888780', Closed:'#D4537E'
-};
-const STATUS_BADGE = {
-  'On my radar':'b-radar', Sent:'b-applied', Talking:'b-reply', Meeting:'b-interview',
-  Offer:'b-offer', Ghosted:'b-ghosted', Closed:'b-closed'
-};
+  let apps = [];
+  let currentFilter = 'all';
+  let editId = null;
+  let statusChart, industryChart;
+  let actionsDismissed = JSON.parse(localStorage.getItem('actionsDismissed') || '[]');
+  let actionsOpen = true;
 
-function save() { localStorage.setItem('jobApps', JSON.stringify(apps)); }
+  const STATUS_COLORS = {
+    'On my radar':'#7F77DD', Sent:'#378ADD', Talking:'#639922',
+    Meeting:'#EF9F27', Offer:'#1D9E75', Ghosted:'#888780', Closed:'#D4537E'
+  };
+  const STATUS_BADGE = {
+    'On my radar':'b-radar', Sent:'b-applied', Talking:'b-reply',
+    Meeting:'b-interview', Offer:'b-offer', Ghosted:'b-ghosted', Closed:'b-closed'
+  };
 
-function uwvStatus(app) {
-  if (app.uwvLogged) return { cls:'uwv-ok', label:'Logged' };
-  if (!app.uwvDeadline) return { cls:'uwv-due', label:'No deadline' };
-  const d = new Date(app.uwvDeadline), now = new Date();
-  const diff = Math.ceil((d - now) / 86400000);
-  if (diff < 0) return { cls:'uwv-overdue', label:'Overdue' };
-  if (diff <= 7) return { cls:'uwv-due', label: diff === 0 ? 'Due today' : 'Due in ' + diff + 'd' };
-  return { cls:'uwv-ok', label: d.toLocaleDateString('nl-NL',{day:'2-digit',month:'2-digit'}) };
-}
-
-function renderMetrics() {
-  const total = apps.length;
-  const replied = apps.filter(a => ['Talking','Meeting','Offer'].includes(a.status)).length;
-  const interviews = apps.filter(a => a.status === 'Meeting').length;
-  const offers = apps.filter(a => a.status === 'Offer').length;
-  const uwvPending = apps.filter(a => !a.uwvLogged).length;
-  const rate = total ? Math.round(replied/total*100) : 0;
-  document.getElementById('metrics').innerHTML = `
-    <div class="metric"><div class="metric-label">Total applied</div><div class="metric-value">${total}</div></div>
-    <div class="metric"><div class="metric-label">Reply rate</div><div class="metric-value">${rate}%</div><div class="metric-sub">${replied} of ${total}</div></div>
-    <div class="metric"><div class="metric-label">Interviews</div><div class="metric-value">${interviews}</div></div>
-    <div class="metric"><div class="metric-label">Offers</div><div class="metric-value">${offers}</div></div>
-    <div class="metric"><div class="metric-label">UWV pending</div><div class="metric-value" style="color:${uwvPending>0?'#BA7517':'inherit'}">${uwvPending}</div><div class="metric-sub">not yet logged</div></div>
-  `;
-}
-
-function renderCharts() {
-  const statCount = {};
-  apps.forEach(a => statCount[a.status] = (statCount[a.status]||0)+1);
-  const statLabels = Object.keys(statCount);
-  const statData = statLabels.map(k => statCount[k]);
-  const statColors = statLabels.map(k => STATUS_COLORS[k] || '#888');
-
-  if (statusChart) statusChart.destroy();
-  statusChart = new Chart(document.getElementById('statusChart'), {
-    type: 'doughnut',
-    data: { labels: statLabels, datasets: [{ data: statData, backgroundColor: statColors, borderWidth: 0, hoverOffset: 4 }] },
-    options: {
-      responsive: true, maintainAspectRatio: false, cutout: '65%',
-      plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ' ' + ctx.label + ': ' + ctx.parsed } } }
+  // ── Config panel ─────────────────────────────────────────────────────────────
+  function saveConfig() {
+    const bin = document.getElementById('cfgBinId').value.trim();
+    const key = document.getElementById('cfgApiKey').value.trim();
+    if (!bin || !key) { alert('Please fill in both fields.'); return; }
+    BIN_ID  = bin;
+    API_KEY = key;
+    localStorage.setItem('jt_bin_id',  bin);
+    localStorage.setItem('jt_api_key', key);
+    document.getElementById('configPanel').style.display = 'none';
+    loadData();
+  }
+  function dismissConfig() {
+    document.getElementById('configPanel').style.display = 'none';
+    localStorage.setItem('jt_config_dismissed', '1');
+  }
+  function initConfigPanel() {
+    if (BIN_ID && API_KEY) {
+      document.getElementById('configPanel').style.display = 'none';
+    } else if (localStorage.getItem('jt_config_dismissed')) {
+      document.getElementById('configPanel').style.display = 'none';
+    } else {
+      document.getElementById('cfgBinId').value  = BIN_ID;
+      document.getElementById('cfgApiKey').value = API_KEY;
     }
-  });
+  }
 
-  const indCount = {};
-  apps.forEach(a => { if (a.industry) indCount[a.industry] = (indCount[a.industry]||0)+1; });
-  const indLabels = Object.keys(indCount).sort((a,b) => indCount[b]-indCount[a]);
-  const indData = indLabels.map(k => indCount[k]);
-  const indColors = ['#378ADD','#1D9E75','#EF9F27','#D4537E','#7F77DD','#D85A30','#639922','#888780'];
+  // ── Storage ───────────────────────────────────────────────────────────────────
+  function setSyncStatus(msg) {
+    document.getElementById('syncStatus').textContent = msg;
+  }
 
-  if (industryChart) industryChart.destroy();
-  industryChart = new Chart(document.getElementById('industryChart'), {
-    type: 'bar',
-    data: { labels: indLabels, datasets: [{ data: indData, backgroundColor: indColors.slice(0, indLabels.length), borderRadius: 4, borderSkipped: false }] },
-    options: {
-      responsive: true, maintainAspectRatio: false, indexAxis: 'y',
-      plugins: { legend: { display: false } },
-      scales: {
-        x: { grid: { display: false }, ticks: { color: '#888', font: { size: 11 }, stepSize: 1 } },
-        y: { grid: { display: false }, ticks: { color: '#888', font: { size: 11 } } }
+  async function loadData() {
+    if (BIN_ID && API_KEY) {
+      setSyncStatus('Syncing...');
+      try {
+        const res = await fetch(JSONBIN_BASE + '/' + BIN_ID + '/latest', {
+          headers: { 'X-Master-Key': API_KEY }
+        });
+        const json = await res.json();
+        apps = json.record.apps || [];
+        setSyncStatus('Synced ✓');
+      } catch(e) {
+        setSyncStatus('Sync failed — using local');
+        apps = JSON.parse(localStorage.getItem('jobApps') || '[]');
+      }
+    } else {
+      apps = JSON.parse(localStorage.getItem('jobApps') || '[]');
+      setSyncStatus('Local storage only');
+    }
+    if (!apps.length) loadSampleData();
+    render();
+  }
+
+  async function saveData() {
+    localStorage.setItem('jobApps', JSON.stringify(apps));
+    if (BIN_ID && API_KEY) {
+      setSyncStatus('Saving...');
+      try {
+        await fetch(JSONBIN_BASE + '/' + BIN_ID, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json', 'X-Master-Key': API_KEY },
+          body: JSON.stringify({ apps })
+        });
+        setSyncStatus('Synced ✓');
+      } catch(e) {
+        setSyncStatus('Saved locally (sync failed)');
       }
     }
-  });
-}
+  }
 
-function renderTable() {
-  const filtered = currentFilter === 'all' ? apps : apps.filter(a => a.status === currentFilter);
-  const tbody = document.getElementById('tableBody');
-  const empty = document.getElementById('emptyState');
-  if (!filtered.length) { tbody.innerHTML = ''; empty.style.display = 'block'; return; }
-  empty.style.display = 'none';
-  tbody.innerHTML = filtered.map(a => {
-    const uwv = uwvStatus(a);
-    const d = a.date ? new Date(a.date).toLocaleDateString('nl-NL',{day:'2-digit',month:'2-digit'}) : '&mdash;';
-    return `<tr ondblclick="openModal(${a.id})">
-      <td class="col-company" title="${a.company}">${a.company}</td>
-      <td class="col-role" title="${a.role}">${a.role}</td>
-      <td class="col-industry">${a.industry||'&mdash;'}</td>
-      <td class="col-date">${d}</td>
-      <td class="col-cover" style="text-align:center">${a.cover ? 'Yes' : 'No'}</td>
-      <td class="col-status"><span class="badge ${STATUS_BADGE[a.status]||''}">${a.status}</span></td>
-      <td class="col-uwv"><span class="uwv-flag"><span class="uwv-dot ${uwv.cls}"></span>${uwv.label}</span></td>
-      <td class="col-notes" title="${a.notes||''}" style="color:var(--color-text-secondary)">${a.notes||' '}</td>
-    </tr>`;
-  }).join('');
-}
+  function loadSampleData() {
+    apps = [
+      { id:1, company:'Booking.com', role:'Product Analyst', industry:'Other', date:'2026-03-01', cover:true, status:'Meeting', deadline:'2026-04-10', uwvLogged:true, notes:'2nd round next week' },
+      { id:2, company:'ING Bank', role:'Data Engineer', industry:'Other', date:'2026-03-05', cover:false, status:'Sent', deadline:'2026-04-20', uwvLogged:false, notes:'' },
+      { id:3, company:'NS', role:'UX Designer', industry:'Other', date:'2026-02-20', cover:true, status:'Closed', deadline:'', uwvLogged:true, notes:'Good feedback' },
+      { id:4, company:'Philips', role:'Business Analyst', industry:'Medical Devices & Diagnostics', date:'2026-03-10', cover:true, status:'Talking', deadline:'2026-04-15', uwvLogged:false, notes:'' },
+      { id:5, company:'ASML', role:'IT Project Manager', industry:'Materials & Nanotechnology', date:'2026-03-15', cover:false, status:'Ghosted', deadline:'', uwvLogged:false, notes:'' },
+    ];
+  }
 
-function render() {
-  renderMetrics();
-  renderCharts();
-  renderTable();
-  renderActions();
-}
-function setFilter(f, el) {
-  currentFilter = f;
-  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-  el.classList.add('active');
-  renderTable();
-}
+  function exportData() {
+    const blob = new Blob([JSON.stringify(apps, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'job-applications.json';
+    a.click();
+  }
 
-function openModal(id) {
-  editId = id || null;
-  document.getElementById('modalTitle').textContent = id ? 'Edit application' : 'Add application';
-  if (id) {
+  // ── Deadline status ───────────────────────────────────────────────────────────
+  function deadlineStatus(app) {
+    if (!app.deadline) return null;
+    const d = new Date(app.deadline), now = new Date();
+    const diff = Math.ceil((d - now) / 86400000);
+    if (diff < 0)  return { cls: 'dl-overdue', label: 'Passed' };
+    if (diff === 0) return { cls: 'dl-due',     label: 'Today' };
+    if (diff <= 7)  return { cls: 'dl-due',     label: 'In ' + diff + 'd' };
+    return { cls: 'dl-ok', label: d.toLocaleDateString('nl-NL', { day:'2-digit', month:'2-digit' }) };
+  }
+
+  // ── Render ────────────────────────────────────────────────────────────────────
+  function renderMetrics() {
+    const total     = apps.length;
+    const replied   = apps.filter(a => ['Talking','Meeting','Offer'].includes(a.status)).length;
+    const interviews= apps.filter(a => a.status === 'Meeting').length;
+    const offers    = apps.filter(a => a.status === 'Offer').length;
+    const rate      = total ? Math.round(replied / total * 100) : 0;
+    document.getElementById('metrics').innerHTML = `
+      <div class="metric"><div class="metric-label">Total applied</div><div class="metric-value">${total}</div></div>
+      <div class="metric"><div class="metric-label">Reply rate</div><div class="metric-value">${rate}%</div><div class="metric-sub">${replied} of ${total}</div></div>
+      <div class="metric"><div class="metric-label">Interviews</div><div class="metric-value">${interviews}</div></div>
+      <div class="metric"><div class="metric-label">Offers</div><div class="metric-value">${offers}</div></div>
+    `;
+  }
+
+  function renderCharts() {
+    const statCount = {};
+    apps.forEach(a => statCount[a.status] = (statCount[a.status] || 0) + 1);
+    const sL = Object.keys(statCount);
+    if (statusChart) statusChart.destroy();
+    statusChart = new Chart(document.getElementById('statusChart'), {
+      type: 'doughnut',
+      data: { labels: sL, datasets: [{ data: sL.map(k => statCount[k]), backgroundColor: sL.map(k => STATUS_COLORS[k] || '#888'), borderWidth: 0, hoverOffset: 4 }] },
+      options: { responsive: true, maintainAspectRatio: false, cutout: '65%', plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ' ' + ctx.label + ': ' + ctx.parsed } } } }
+    });
+
+    const indCount = {};
+    apps.forEach(a => { if (a.industry) indCount[a.industry] = (indCount[a.industry] || 0) + 1; });
+    const iL = Object.keys(indCount).sort((a,b) => indCount[b] - indCount[a]);
+    const iC = ['#378ADD','#1D9E75','#EF9F27','#D4537E','#7F77DD','#D85A30','#639922','#888780'];
+    if (industryChart) industryChart.destroy();
+    industryChart = new Chart(document.getElementById('industryChart'), {
+      type: 'bar',
+      data: { labels: iL, datasets: [{ data: iL.map(k => indCount[k]), backgroundColor: iC.slice(0, iL.length), borderRadius: 4, borderSkipped: false }] },
+      options: { responsive: true, maintainAspectRatio: false, indexAxis: 'y', plugins: { legend: { display: false } }, scales: { x: { grid: { display: false }, ticks: { color: '#888', font: { size: 11 }, stepSize: 1 } }, y: { grid: { display: false }, ticks: { color: '#888', font: { size: 11 } } } } }
+    });
+  }
+
+  function renderTable() {
+    const filtered = currentFilter === 'all' ? apps : apps.filter(a => a.status === currentFilter);
+    const tbody = document.getElementById('tableBody');
+    const empty = document.getElementById('emptyState');
+    if (!filtered.length) { tbody.innerHTML = ''; empty.style.display = 'block'; return; }
+    empty.style.display = 'none';
+    tbody.innerHTML = filtered.map(a => {
+      const dl  = deadlineStatus(a);
+      const d   = a.date ? new Date(a.date).toLocaleDateString('nl-NL', { day:'2-digit', month:'2-digit' }) : '—';
+      const dlCell = dl
+        ? `<span class="dl-flag"><span class="dl-dot ${dl.cls}"></span>${dl.label}</span>`
+        : `<span style="color:var(--text-3)">—</span>`;
+      return `<tr ondblclick="openModal(${a.id})">
+        <td title="${a.company}">${a.company}</td>
+        <td title="${a.role}">${a.role}</td>
+        <td>${a.industry || '—'}</td>
+        <td>${d}</td>
+        <td style="text-align:center">${a.cover ? 'Yes' : 'No'}</td>
+        <td><span class="badge ${STATUS_BADGE[a.status] || ''}">${a.status}</span></td>
+        <td>${dlCell}</td>
+        <td title="${a.notes || ''}" style="color:var(--text-2)">${a.notes || ''}</td>
+      </tr>`;
+    }).join('');
+  }
+
+  function renderActions() {
+    const actions = [];
+    apps.forEach(a => {
+      const days = (new Date() - new Date(a.date)) / 86400000;
+      if (a.status === 'Sent' && days > 5)
+        actions.push({ id: 'follow_' + a.id, text: 'Follow up: ' + a.company + ' (' + Math.floor(days) + 'd ago)' });
+      if (a.status === 'Meeting')
+        actions.push({ id: 'prep_' + a.id, text: 'Prep meeting: ' + a.company });
+      if (a.deadline) {
+        const diff = Math.ceil((new Date(a.deadline) - new Date()) / 86400000);
+        if (diff >= 0 && diff <= 3 && !['Offer','Closed','Ghosted'].includes(a.status))
+          actions.push({ id: 'deadline_' + a.id, text: 'Deadline soon: ' + a.company + ' (' + (diff === 0 ? 'today' : diff + 'd left') + ')' });
+      }
+    });
+    const pending = actions.filter(a => !actionsDismissed.includes(a.id)).length;
+    document.getElementById('actionsBadge').textContent = pending + ' to do';
+    const list = document.getElementById('actionsList');
+    if (!actions.length) { list.innerHTML = '<span style="color:var(--text-3)">You\'re all caught up!</span>'; return; }
+    list.innerHTML = actions.map(a => {
+      const done = actionsDismissed.includes(a.id);
+      return `<div class="action-item ${done ? 'done' : ''}">
+        <input type="checkbox" ${done ? 'checked' : ''} onchange="toggleAction('${a.id}',this.checked)" />
+        <span>${a.text}</span>
+      </div>`;
+    }).join('');
+  }
+
+  function render() { renderMetrics(); renderCharts(); renderTable(); renderActions(); }
+
+  // ── Interactions ──────────────────────────────────────────────────────────────
+  function setFilter(f, el) {
+    currentFilter = f;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    el.classList.add('active');
+    renderTable();
+  }
+
+  function toggleActions() {
+    actionsOpen = !actionsOpen;
+    document.getElementById('actionsList').style.display = actionsOpen ? 'block' : 'none';
+    document.getElementById('actionsToggleIcon').innerHTML = actionsOpen ? '&#9660;' : '&#9654;';
+  }
+
+  function toggleAction(id, checked) {
+    if (checked) { if (!actionsDismissed.includes(id)) actionsDismissed.push(id); }
+    else actionsDismissed = actionsDismissed.filter(x => x !== id);
+    localStorage.setItem('actionsDismissed', JSON.stringify(actionsDismissed));
+    renderActions();
+  }
+
+  // ── Modal ─────────────────────────────────────────────────────────────────────
+  function openModal(id) {
+    editId = id || null;
+    document.getElementById('modalTitle').textContent = id ? 'Edit application' : 'Add application';
+    if (id) {
+      const a = apps.find(x => x.id === id);
+      document.getElementById('fCompany').value   = a.company;
+      document.getElementById('fRole').value      = a.role;
+      document.getElementById('fIndustry').value  = a.industry || '';
+      document.getElementById('fDate').value      = a.date || '';
+      document.getElementById('fDeadline').value  = a.deadline || '';
+      document.getElementById('fStatus').value    = a.status;
+      document.getElementById('fCover').checked   = a.cover;
+      document.getElementById('fUwvLogged').checked = a.uwvLogged;
+      document.getElementById('fNotes').value     = a.notes || '';
+    } else {
+      document.getElementById('fCompany').value   = '';
+      document.getElementById('fRole').value      = '';
+      document.getElementById('fIndustry').value  = '';
+      document.getElementById('fDate').value      = new Date().toISOString().split('T')[0];
+      document.getElementById('fDeadline').value  = '';
+      document.getElementById('fStatus').value    = 'Sent';
+      document.getElementById('fCover').checked   = false;
+      document.getElementById('fUwvLogged').checked = false;
+      document.getElementById('fNotes').value     = '';
+    }
+    document.getElementById('modalBg').classList.add('open');
+    document.getElementById('btnDelete').style.display = id ? 'inline-block' : 'none';
+  }
+
+  function closeModal() { document.getElementById('modalBg').classList.remove('open'); }
+
+  async function saveApp() {
+    const company = document.getElementById('fCompany').value.trim();
+    const role    = document.getElementById('fRole').value.trim();
+    if (!company || !role) { alert('Company and role are required.'); return; }
+    const app = {
+      id:         editId || Date.now(),
+      company,    role,
+      industry:   document.getElementById('fIndustry').value,
+      date:       document.getElementById('fDate').value,
+      deadline:   document.getElementById('fDeadline').value,
+      status:     document.getElementById('fStatus').value,
+      cover:      document.getElementById('fCover').checked,
+      uwvLogged:  document.getElementById('fUwvLogged').checked,
+      notes:      document.getElementById('fNotes').value.trim()
+    };
+    if (editId) { const i = apps.findIndex(x => x.id === editId); apps[i] = app; }
+    else apps.unshift(app);
+    closeModal();
+    render();
+    await saveData();
+  }
+
+  async function deleteApp(id) {
     const a = apps.find(x => x.id === id);
-    document.getElementById('fCompany').value = a.company;
-    document.getElementById('fRole').value = a.role;
-    document.getElementById('fIndustry').value = a.industry || '';
-    document.getElementById('fDate').value = a.date || '';
-    document.getElementById('fStatus').value = a.status;
-    document.getElementById('fCover').checked = a.cover;
-    document.getElementById('fUwvLogged').checked = a.uwvLogged;
-    document.getElementById('fUwvDeadline').value = a.uwvDeadline || '';
-    document.getElementById('fNotes').value = a.notes || ' ';
-  } else {
-    document.getElementById('fCompany').value = '';
-    document.getElementById('fRole').value = '';
-    document.getElementById('fIndustry').value = '';
-    document.getElementById('fDate').value = new Date().toISOString().split('T')[0];
-    document.getElementById('fStatus').value = 'Sent';
-    document.getElementById('fCover').checked = false;
-    document.getElementById('fUwvLogged').checked = false;
-    document.getElementById('fUwvDeadline').value = '';
-    document.getElementById('fNotes').value = ' ';
+    if (!a) return;
+    if (!confirm('Delete application for "' + a.role + '" at ' + a.company + '?')) return;
+    apps = apps.filter(x => x.id !== id);
+    closeModal();
+    render();
+    await saveData();
   }
-  document.getElementById('modalBg').classList.add('open');
-document.getElementById('btnDelete').style.display = id ? 'inline-block' : 'none';
-}
 
-function closeModal() { document.getElementById('modalBg').classList.remove('open'); }
-
-function saveApp() {
-  const company = document.getElementById('fCompany').value.trim();
-  const role = document.getElementById('fRole').value.trim();
-  if (!company || !role) { alert('Company and role are required.'); return; }
-  const app = {
-    id: editId || Date.now(),
-    company, role,
-    industry: document.getElementById('fIndustry').value,
-    date: document.getElementById('fDate').value,
-    status: document.getElementById('fStatus').value,
-    cover: document.getElementById('fCover').checked,
-    uwvLogged: document.getElementById('fUwvLogged').checked,
-    uwvDeadline: document.getElementById('fUwvDeadline').value,
-    notes: document.getElementById('fNotes').value.trim()
-  };
-  if (editId) { const i = apps.findIndex(x => x.id === editId); apps[i] = app; }
-  else apps.unshift(app);
-  save(); closeModal(); render();
-}
-
-document.getElementById('modalBg').addEventListener('click', function(e) {
-  if (e.target === this) closeModal();
-});
-
-render();
-
-function toggleActions() {
-  actionsOpen = !actionsOpen;
-  document.getElementById('actionsList').style.display = actionsOpen ? 'block' : 'none';
-  document.getElementById('actionsToggleIcon').textContent = actionsOpen ? 'v' : '>';
-}
-
-function renderActions() {
-  const UWV_CUTOFF = new Date('2026-03-01');
-  const actions = [];
-
-  apps.forEach(a => {
-    const days = (new Date() - new Date(a.date)) / 86400000;
-    const appliedDate = new Date(a.date);
-
-    if (a.status === 'Sent' && days > 5) {
-      actions.push({ id: 'follow_' + a.id, text: 'Follow up: ' + a.company + ' (' + Math.floor(days) + 'd ago)' });
-    }
-    if (!a.uwvLogged && appliedDate >= UWV_CUTOFF) {
-      actions.push({ id: 'uwv_' + a.id, text: 'Log UWV: ' + a.company });
-    }
-    if (a.status === 'Meeting') {
-  actions.push({ id: 'interview_' + a.id, text: 'Prep meeting: ' + a.company });
-}
+  document.getElementById('modalBg').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
   });
 
-  const pending = actions.filter(a => !actionsDismissed.includes(a.id)).length;
-  document.getElementById('actionsBadge').textContent = pending + ' to do';
-
-  const list = document.getElementById('actionsList');
-  if (!actions.length) {
-    list.innerHTML = '<span>You\'re on track!</span>';
-    return;
-  }
-  list.innerHTML = actions.map(a => {
-    const done = actionsDismissed.includes(a.id);
-    return `<div class="action-item ${done ? 'done' : ''}">
-      <input type="checkbox" ${done ? 'checked' : ''} onchange="toggleAction('${a.id}', this.checked)" />
-      <span>${a.text}</span>
-    </div>`;
-  }).join('');
-}
-
-function toggleAction(id, checked) {
-  if (checked) {
-    if (!actionsDismissed.includes(id)) actionsDismissed.push(id);
-  } else {
-    actionsDismissed = actionsDismissed.filter(x => x !== id);
-  }
-  localStorage.setItem('actionsDismissed', JSON.stringify(actionsDismissed));
-  renderActions();
-}
-  function deleteApp(id) {
-  const a = apps.find(x => x.id === id);
-  if (!a) return;
-  if (!confirm(`Delete application for "${a.role}" at ${a.company}?`)) return;
-  apps = apps.filter(x => x.id !== id);
-  save(); closeModal(); render();
-}
+  // ── Init ──────────────────────────────────────────────────────────────────────
+  initConfigPanel();
+  loadData();
 </script>
+</body>
+</html>
