@@ -117,31 +117,13 @@
     .btn-delete:hover { background: #FCEBEB; }
     .form-section { font-size: 11px; font-weight: 600; letter-spacing: 0.06em; color: var(--text-3); text-transform: uppercase; margin: 16px 0 10px; border-top: 0.5px solid var(--border); padding-top: 14px; }
 
-    /* JSONBin config panel */
-    .config-panel { background: #FFF8E6; border: 1px solid #FAC775; border-radius: var(--radius-lg); padding: 1rem 1.25rem; margin-bottom: 1.25rem; font-size: 13px; }
-    .config-panel strong { color: #633806; }
-    .config-panel input { margin-top: 6px; width: 100%; padding: 6px 9px; font-size: 12px; border-radius: 6px; border: 1px solid #FAC775; background: #fff; font-family: monospace; }
-    .config-panel .cfg-row { margin-top: 8px; }
-    .config-panel label { font-size: 12px; color: #633806; display: block; margin-bottom: 3px; }
-    .cfg-actions { display: flex; gap: 8px; margin-top: 10px; }
-    .cfg-save-btn { font-size: 12px; padding: 5px 12px; border-radius: 6px; border: none; background: #185FA5; color: white; }
-    .cfg-dismiss-btn { font-size: 12px; padding: 5px 12px; border-radius: 6px; border: 0.5px solid var(--border-2); background: transparent; color: var(--text-2); }
+
   </style>
 </head>
 <body>
 <div class="container">
 
-  <!-- Config panel (shown when no JSONBin is set up) -->
-  <div class="config-panel" id="configPanel">
-    <strong>&#9729; Optional: sync data to the cloud (JSONBin.io)</strong>
-    <p style="margin-top:5px; color:#633806;">Without this, data is saved in this browser only. To sync across devices or make it public, create a free bin at <a href="https://jsonbin.io" target="_blank" style="color:#185FA5;">jsonbin.io</a>, then paste your details below.</p>
-    <div class="cfg-row"><label>JSONBin Bin ID</label><input id="cfgBinId" placeholder="e.g. 6619f3a5acd3cb34a83d1234" /></div>
-    <div class="cfg-row"><label>JSONBin API Key (X-Master-Key)</label><input id="cfgApiKey" placeholder="$2a$10$..." /></div>
-    <div class="cfg-actions">
-      <button class="cfg-save-btn" onclick="saveConfig()">Save &amp; sync</button>
-      <button class="cfg-dismiss-btn" onclick="dismissConfig()">Use local storage only</button>
-    </div>
-  </div>
+
 
   <!-- Top bar -->
   <div class="top-bar">
@@ -278,14 +260,6 @@
 </div>
 
 <script>
-  // ─── CONFIG ──────────────────────────────────────────────────────────────────
-  // Fill these in, or use the yellow panel above to set them via the UI.
-  // Get a free API key + bin ID at https://jsonbin.io
-  const JSONBIN_BASE = 'https://api.jsonbin.io/v3/b';
-  let BIN_ID  = localStorage.getItem('jt_bin_id')  || '';
-  let API_KEY = localStorage.getItem('jt_api_key') || '';
-  // ─────────────────────────────────────────────────────────────────────────────
-
   let apps = [];
   let currentFilter = 'all';
   let editId = null;
@@ -302,75 +276,19 @@
     Meeting:'b-interview', Offer:'b-offer', Ghosted:'b-ghosted', Closed:'b-closed'
   };
 
-  // ── Config panel ─────────────────────────────────────────────────────────────
-  function saveConfig() {
-    const bin = document.getElementById('cfgBinId').value.trim();
-    const key = document.getElementById('cfgApiKey').value.trim();
-    if (!bin || !key) { alert('Please fill in both fields.'); return; }
-    BIN_ID  = bin;
-    API_KEY = key;
-    localStorage.setItem('jt_bin_id',  bin);
-    localStorage.setItem('jt_api_key', key);
-    document.getElementById('configPanel').style.display = 'none';
-    loadData();
-  }
-  function dismissConfig() {
-    document.getElementById('configPanel').style.display = 'none';
-    localStorage.setItem('jt_config_dismissed', '1');
-  }
-  function initConfigPanel() {
-    if (BIN_ID && API_KEY) {
-      document.getElementById('configPanel').style.display = 'none';
-    } else if (localStorage.getItem('jt_config_dismissed')) {
-      document.getElementById('configPanel').style.display = 'none';
-    } else {
-      document.getElementById('cfgBinId').value  = BIN_ID;
-      document.getElementById('cfgApiKey').value = API_KEY;
-    }
-  }
-
   // ── Storage ───────────────────────────────────────────────────────────────────
   function setSyncStatus(msg) {
     document.getElementById('syncStatus').textContent = msg;
   }
 
-  async function loadData() {
-    if (BIN_ID && API_KEY) {
-      setSyncStatus('Syncing...');
-      try {
-        const res = await fetch(JSONBIN_BASE + '/' + BIN_ID + '/latest', {
-          headers: { 'X-Master-Key': API_KEY }
-        });
-        const json = await res.json();
-        apps = json.record.apps || [];
-        setSyncStatus('Synced ✓');
-      } catch(e) {
-        setSyncStatus('Sync failed — using local');
-        apps = JSON.parse(localStorage.getItem('jobApps') || '[]');
-      }
-    } else {
-      apps = JSON.parse(localStorage.getItem('jobApps') || '[]');
-      setSyncStatus('Local storage only');
-    }
+  function loadData() {
+    apps = JSON.parse(localStorage.getItem('jobApps') || '[]');
     if (!apps.length) loadSampleData();
     render();
   }
 
-  async function saveData() {
+  function saveData() {
     localStorage.setItem('jobApps', JSON.stringify(apps));
-    if (BIN_ID && API_KEY) {
-      setSyncStatus('Saving...');
-      try {
-        await fetch(JSONBIN_BASE + '/' + BIN_ID, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json', 'X-Master-Key': API_KEY },
-          body: JSON.stringify({ apps })
-        });
-        setSyncStatus('Synced ✓');
-      } catch(e) {
-        setSyncStatus('Saved locally (sync failed)');
-      }
-    }
   }
 
   function loadSampleData() {
@@ -584,7 +502,6 @@
   });
 
   // ── Init ──────────────────────────────────────────────────────────────────────
-  initConfigPanel();
   loadData();
 </script>
 </body>
