@@ -342,6 +342,7 @@ function openModal(id) {
     document.getElementById('fUwvLogged').checked = a.uwvLogged;
     document.getElementById('fDeadline').value = a.deadline || '';
     document.getElementById('fConfirmation').value = a.confirmation || '';
+    document.getElementById('fJobLink').value = a.jobLink || '';
     document.getElementById('fNotes').value = a.notes || ' ';
   } else {
     document.getElementById('fCompany').value = '';
@@ -353,6 +354,7 @@ function openModal(id) {
     document.getElementById('fUwvLogged').checked = false;
     document.getElementById('fDeadline').value = '';
     document.getElementById('fConfirmation').value = '';
+    document.getElementById('fJobLink').value = '';
     document.getElementById('fNotes').value = ' ';
   }
   document.getElementById('modalBg').classList.add('open');
@@ -375,6 +377,7 @@ function saveApp() {
     uwvLogged: document.getElementById('fUwvLogged').checked,
     deadline: document.getElementById('fDeadline').value,
     confirmation: document.getElementById('fConfirmation').value.trim(),
+    jobLink: document.getElementById('fJobLink').value.trim(),
     notes: document.getElementById('fNotes').value.trim()
   };
   if (editId) { const i = apps.findIndex(x => x.id === editId); apps[i] = app; }
