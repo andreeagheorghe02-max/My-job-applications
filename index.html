@@ -80,6 +80,7 @@
   .col-cover { width: 7%; text-align: center; }
   .col-status { width: 13%; }
   .col-deadline { width: 13%; }
+  .col-link { width: 10%; } 
   .col-notes { width: 9%; }
 button {
   transition: all 0.15s ease;
@@ -195,6 +196,7 @@ button:hover {
     </div>
     <div class="form-row"><label>Application deadline</label><input type="date" id="fDeadline" /></div>
     <div class="form-row"><label>Confirmation link (Google Drive)</label><input id="fConfirmation" placeholder="Paste Google Drive link to confirmation PDF" /></div>
+    <div class="form-row"><label>Job link</label><input id="fJobLink" placeholder="Paste job description URL" /></div>
     <div class="form-row"><label>Notes</label><input id="fNotes" placeholder="Optional notes" /></div>
     <div class="modal-actions">
   <button class="btn-delete" id="btnDelete" style="display:none;" onclick="deleteApp(editId)">Delete</button>
