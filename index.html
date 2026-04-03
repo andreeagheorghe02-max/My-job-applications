@@ -309,13 +309,21 @@ function renderTable() {
       <td class="col-date">${d}</td>
       <td class="col-cover" style="text-align:center">${a.cover ? 'Yes' : 'No'}</td>
       <td class="col-status"><span class="badge ${STATUS_BADGE[a.status]||''}">${a.status}</span></td>
-      <td class="col-deadline"><span class="uwv-flag"><span class="uwv-dot ${dl.cls}"></span>${dl.label}</span></td>
-      <td class="col-link">
+      <td class="col-deadline">
+  <span class="uwv-flag">
+    <span class="uwv-dot ${dl.cls}"></span>${dl.label}
+  </span>
+</td>
+
+<td class="col-link">
   ${a.jobLink 
     ? `<a href="${a.jobLink}" target="_blank" style="color:#185FA5; font-weight:500;">Jump to job</a>` 
     : ''}
 </td>
-      <td class="col-notes" title="${a.notes||''}" style="color:var(--color-text-secondary)">${a.notes||' '}</td>
+
+<td class="col-notes" title="${a.notes||''}" style="color:var(--color-text-secondary)">
+  ${a.notes||' '}
+</td>
     </tr>`;
   }).join('');
 }
