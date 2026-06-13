@@ -194,9 +194,7 @@ button:hover {
     <div class="form-row">
       <div class="form-check"><input type="checkbox" id="fUwvLogged" /><label for="fUwvLogged">Reported to UWV</label></div>
     </div>
-   <div class="form-row">
-      <div class="form-check"><input type="checkbox" id="fInterview" /><label for="fInterview">Had interview</label></div>
-    </div>
+    <div class="form-row"><label>Interview date</label><input type="date" id="fInterviewDate" /></div>
     <div class="form-row"><label>Application deadline</label><input type="date" id="fDeadline" /></div>
     <div class="form-row"><label>Confirmation link (Google Drive)</label><input id="fConfirmation" placeholder="Paste Google Drive link to confirmation PDF" /></div>
     <div class="form-row"><label>Job link</label><input id="fJobLink" placeholder="Paste job description URL" /></div>
@@ -245,14 +243,14 @@ function deadlineStatus(app) {
 function renderMetrics() {
   const total = apps.length;
   const replied = apps.filter(a => ['Talking','Meeting','Offer'].includes(a.status)).length;
-  const interviews = apps.filter(a => a.status === 'Meeting').length;
+  const interviews = apps.filter(a => a.interviewDate).length;
   const offers = apps.filter(a => a.status === 'Offer').length;
   const uwvPending = apps.filter(a => !a.uwvLogged && ['Sent','Talking','Meeting','Offer','Ghosted','Closed'].includes(a.status)).length;
   const rate = total ? Math.round(replied/total*100) : 0;
   document.getElementById('metrics').innerHTML = `
     <div class="metric"><div class="metric-label">Total applied</div><div class="metric-value">${total}</div></div>
-    <div class="metric"><div class="metric-label">Reply rate</div><div class="metric-value">${rate}%</div><div class="metric-sub">${replied} of ${total}</div></div>
-    <div class="metric"><div class="metric-label">Interviews</div><div class="metric-value">${interviews}</div></div>
+<div class="metric"><div class="metric-label">Active</div><div class="metric-value">${replied}</div><div class="metric-sub">Talking, Meeting, Offer</div></div>
+<div class="metric"><div class="metric-label">Interviews</div><div class="metric-value">${interviews}</div></div>
     <div class="metric"><div class="metric-label">Offers</div><div class="metric-value">${offers}</div></div>
     <div class="metric"><div class="metric-label">UWV pending</div><div class="metric-value" style="color:${uwvPending>0?'#BA7517':'inherit'}">${uwvPending}</div><div class="metric-sub">not yet logged</div></div>
   `;
@@ -356,7 +354,7 @@ function openModal(id) {
     document.getElementById('fStatus').value = a.status;
     document.getElementById('fCover').checked = a.cover;
     document.getElementById('fUwvLogged').checked = a.uwvLogged;
-    document.getElementById('fInterview').checked = a.hadInterview || false;
+    document.getElementById('fInterviewDate').value = a.interviewDate || '';
     document.getElementById('fDeadline').value = a.deadline || '';
     document.getElementById('fConfirmation').value = a.confirmation || '';
     document.getElementById('fJobLink').value = a.jobLink || '';
@@ -369,7 +367,7 @@ function openModal(id) {
     document.getElementById('fStatus').value = 'Sent';
     document.getElementById('fCover').checked = false;
     document.getElementById('fUwvLogged').checked = false;
-    document.getElementById('fInterview').checked = false;
+    document.getElementById('fInterviewDate').value = '';
     document.getElementById('fDeadline').value = '';
     document.getElementById('fConfirmation').value = '';
     document.getElementById('fJobLink').value = '';
@@ -393,7 +391,7 @@ function saveApp() {
     status: document.getElementById('fStatus').value,
     cover: document.getElementById('fCover').checked,
     uwvLogged: document.getElementById('fUwvLogged').checked,
-    hadInterview: document.getElementById('fInterview').checked,
+    interviewDate: document.getElementById('fInterviewDate').value,
     deadline: document.getElementById('fDeadline').value,
     confirmation: document.getElementById('fConfirmation').value.trim(),
     jobLink: document.getElementById('fJobLink').value.trim(),
