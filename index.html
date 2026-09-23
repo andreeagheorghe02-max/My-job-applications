@@ -688,7 +688,11 @@ function renderCharts() {
   });
 }
 function renderTable() {
-  const filtered = sortApps(currentFilter === 'all' ? apps : apps.filter(a => a.status === currentFilter));
+  const filtered = sortApps(
+    currentFilter === 'all'
+      ? apps
+      : apps.filter(a => a.status === currentFilter)
+  ).slice(0, 10);
   const tbody = document.getElementById('tableBody');
   const empty = document.getElementById('emptyState');
 
