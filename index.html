@@ -94,7 +94,28 @@ button:hover {
 .action-item.done { opacity:0.4; text-decoration:line-through; }
 .action-item input[type=checkbox] { width:auto; margin:0; cursor:pointer; }
 .b-radar { background: #EEEDFE; color: #3C3489; }
-/* =========================================
+.table-expander {
+  display: flex;
+  justify-content: center;
+  padding: 12px;
+  border-top: 1px solid var(--color-border-tertiary, #e5e5e5);
+  background: #fff;
+}
+
+.table-expander button {
+  border: 1px solid #ddd;
+  background: #f7f8fa;
+  color: #185FA5;
+  border-radius: 8px;
+  padding: 7px 14px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.table-expander button:hover {
+  background: #eef3f8;
+}
+ /* =========================================
    JOB SEARCH DASHBOARD
    ========================================= */
 
@@ -479,6 +500,7 @@ button:hover {
       <tbody id="tableBody"></tbody>
     </table>
     <div id="emptyState" class="empty" style="display:none;">No applications yet &mdash; add your first one!</div>
+       <div id="tableExpander" class="table-expander" style="display:none;"></div>
   </div>
 </div>
 
@@ -587,7 +609,8 @@ function sortApps(list) {
   });
   return sorted;
 }
- let editId = null;
+let editId = null;
+let applicationsExpanded = false;
 let statusChart, industryChart;
 let actionsDismissed = JSON.parse(localStorage.getItem('actionsDismissed') || '[]');
 let actionsOpen = true;
@@ -688,47 +711,91 @@ function renderCharts() {
   });
 }
 function renderTable() {
-  const filtered = sortApps(
+  const allFiltered = sortApps(
     currentFilter === 'all'
       ? apps
       : apps.filter(a => a.status === currentFilter)
-  ).slice(0, 10);
+  );
+
+  const visible = applicationsExpanded
+    ? allFiltered
+    : allFiltered.slice(0, 10);
+
   const tbody = document.getElementById('tableBody');
   const empty = document.getElementById('emptyState');
+  const expander = document.getElementById('tableExpander');
 
   document.querySelectorAll('.sort-arrow').forEach(el => {
-    el.textContent = el.dataset.col === sortCol ? (sortDir === 'asc' ? '▲' : '▼') : '';
+    el.textContent =
+      el.dataset.col === sortCol
+        ? (sortDir === 'asc' ? '▲' : '▼')
+        : '';
   });
 
-  if (!filtered.length) { tbody.innerHTML = ''; empty.style.display = 'block'; return; }
+  if (!allFiltered.length) {
+    tbody.innerHTML = '';
+    empty.style.display = 'block';
+    expander.style.display = 'none';
+    return;
+  }
+
   empty.style.display = 'none';
-  tbody.innerHTML = filtered.map(a => {
+
+  tbody.innerHTML = visible.map(a => {
     const dl = deadlineStatus(a);
-    const d = a.date ? new Date(a.date).toLocaleDateString('nl-NL',{day:'2-digit',month:'2-digit'}) : '&mdash;';
+    const d = a.date
+      ? new Date(a.date).toLocaleDateString('nl-NL', {
+          day: '2-digit',
+          month: '2-digit'
+        })
+      : '&mdash;';
+
     return `<tr ondblclick="openModal(${a.id})">
       <td class="col-company" title="${a.company}">${a.company}</td>
       <td class="col-role" title="${a.role}">${a.role}</td>
-      <td class="col-industry">${a.industry||'&mdash;'}</td>
+      <td class="col-industry">${a.industry || '&mdash;'}</td>
       <td class="col-date">${d}</td>
       <td class="col-cover" style="text-align:center">${a.cover ? 'Yes' : 'No'}</td>
-      <td class="col-status"><span class="badge ${STATUS_BADGE[a.status]||''}">${a.status}</span></td>
+      <td class="col-status">
+        <span class="badge ${STATUS_BADGE[a.status] || ''}">
+          ${a.status}
+        </span>
+      </td>
       <td class="col-deadline">
-  <span class="uwv-flag">
-    <span class="uwv-dot ${dl.cls}"></span>${dl.label}
-  </span>
-</td>
-
-<td class="col-link">
-  ${a.jobLink 
-    ? `<a href="${a.jobLink}" target="_blank" style="color:#185FA5; font-weight:500;">Jump to job</a>` 
-    : ''}
-</td>
-
-<td class="col-notes" title="${a.notes||''}" style="color:var(--color-text-secondary)">
-  ${a.notes||' '}
-</td>
+        <span class="uwv-flag">
+          <span class="uwv-dot ${dl.cls}"></span>${dl.label}
+        </span>
+      </td>
+      <td class="col-link">
+        ${a.jobLink
+          ? `<a href="${a.jobLink}" target="_blank" style="color:#185FA5; font-weight:500;">Jump to job</a>`
+          : ''}
+      </td>
+      <td class="col-notes" title="${a.notes || ''}" style="color:var(--color-text-secondary)">
+        ${a.notes || ' '}
+      </td>
     </tr>`;
   }).join('');
+
+  if (allFiltered.length > 10) {
+    expander.style.display = 'flex';
+
+    expander.innerHTML = `
+      <button type="button" onclick="toggleApplicationsExpanded()">
+        ${applicationsExpanded
+          ? '− Show fewer applications'
+          : `+ Show all applications (${allFiltered.length})`}
+      </button>
+    `;
+   } else {
+    expander.style.display = 'none';
+    expander.innerHTML = '';
+  }
+}
+
+function toggleApplicationsExpanded() {
+  applicationsExpanded = !applicationsExpanded;
+  renderTable();
 }
 
 function render() {
@@ -739,6 +806,7 @@ function render() {
 }
 function setFilter(f, el) {
   currentFilter = f;
+  applicationsExpanded = false;
   document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
   el.classList.add('active');
   renderTable();
