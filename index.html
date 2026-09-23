@@ -576,18 +576,40 @@ function deadlineStatus(app) {
 }
 
 function renderMetrics() {
-  const total = apps.length;
+  const total = apps.filter(a => a.status !== 'On my radar').length;
   const replied = apps.filter(a => ['Talking','Meeting','Offer'].includes(a.status)).length;
   const interviews = apps.filter(a => a.interviewDate).length;
   const offers = apps.filter(a => a.status === 'Offer').length;
-  const uwvPending = apps.filter(a => !a.uwvLogged && ['Sent','Talking','Meeting','Offer','Ghosted','Closed'].includes(a.status)).length;
-  const rate = total ? Math.round(replied/total*100) : 0;
+  const uwvPending = apps.filter(a =>
+    !a.uwvLogged &&
+    ['Sent','Talking','Meeting','Offer','Ghosted','Closed'].includes(a.status)
+  ).length;
+
+  const rate = total ? Math.round(replied / total * 100) : 0;
+
   document.getElementById('metrics').innerHTML = `
-    <div class="metric"><div class="metric-label">Total applied</div><div class="metric-value">${total}</div></div>
-<div class="metric"><div class="metric-label">Active</div><div class="metric-value">${replied}</div><div class="metric-sub">Talking, Meeting, Offer</div></div>
-<div class="metric"><div class="metric-label">Interviews</div><div class="metric-value">${interviews}</div></div>
-    <div class="metric"><div class="metric-label">Offers</div><div class="metric-value">${offers}</div></div>
-    <div class="metric"><div class="metric-label">UWV pending</div><div class="metric-value" style="color:${uwvPending>0?'#BA7517':'inherit'}">${uwvPending}</div><div class="metric-sub">not yet logged</div></div>
+    <div class="metric">
+      <div class="metric-label">Total applied</div>
+      <div class="metric-value">${total}</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">Active</div>
+      <div class="metric-value">${replied}</div>
+      <div class="metric-sub">Talking, Meeting, Offer</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">Interviews</div>
+      <div class="metric-value">${interviews}</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">Offers</div>
+      <div class="metric-value">${offers}</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">UWV pending</div>
+      <div class="metric-value" style="color:${uwvPending > 0 ? '#BA7517' : 'inherit'}">${uwvPending}</div>
+      <div class="metric-sub">not yet logged</div>
+    </div>
   `;
 }
 
@@ -805,65 +827,70 @@ function toggleAction(id, checked) {
   if (!confirm(`Delete application for "${a.role}" at ${a.company}?`)) return;
   apps = apps.filter(x => x.id !== id);
   save(); closeModal(); render();
-   /* =========================================
+   /* =========================================================
    DAILY JOB SEARCH DASHBOARD
-   ========================================= */
+   ========================================================= */
 
 const DAILY_CHECKLIST = [
   {
     id: 'linkedin',
     label: 'Check LinkedIn Jobs',
-    description: 'Search new jobs and saved alerts',
+    description: 'Search for new roles and recruiter posts.',
     url: 'https://www.linkedin.com/jobs/'
   },
   {
     id: 'indeed',
     label: 'Check Indeed',
-    description: 'Search newly posted Netherlands jobs',
+    description: 'Search Netherlands + relevant scientific/editorial roles.',
     url: 'https://nl.indeed.com/'
   },
   {
     id: 'academictransfer',
     label: 'Check AcademicTransfer',
-    description: 'Academic, research and science roles',
+    description: 'Universities, research institutes and science roles.',
     url: 'https://www.academictransfer.com/'
   },
   {
     id: 'euraxess',
     label: 'Check EURAXESS',
-    description: 'Research and scientific positions',
+    description: 'European research and science vacancies.',
     url: 'https://euraxess.ec.europa.eu/jobs/search'
   },
   {
     id: 'googlejobs',
     label: 'Check Google Jobs',
-    description: 'Broader search across job sites',
+    description: 'Broad search across company and recruitment websites.',
     url: 'https://www.google.com/search?q=jobs+Netherlands'
   },
   {
     id: 'companies',
     label: 'Check companies due today',
-    description: 'Review your company watchlist'
+    description: 'Review your company watchlist.',
+    url: null
   },
   {
-    id: 'saved',
+    id: 'alerts',
     label: 'Review saved job alerts',
-    description: 'LinkedIn, Indeed and other alerts'
+    description: 'Check LinkedIn, Indeed and other alerts.',
+    url: null
   },
   {
     id: 'radar',
-    label: "Review 'On my radar'",
-    description: 'Decide what deserves an application'
+    label: 'Review "On my radar"',
+    description: 'Decide whether to apply, investigate or close.',
+    url: null
   },
   {
     id: 'followups',
     label: 'Check application follow-ups',
-    description: 'Follow up on recent applications'
+    description: 'See whether any application needs action.',
+    url: null
   },
   {
     id: 'networking',
-    label: 'One networking action',
-    description: 'Message someone, connect or follow up'
+    label: 'Do one networking action',
+    description: 'Message a contact, recruiter, editor or scientist.',
+    url: null
   }
 ];
 
@@ -871,102 +898,71 @@ const DAILY_CHECKLIST = [
 function getTodayKey() {
   const now = new Date();
 
-  return [
-    now.getFullYear(),
-    String(now.getMonth() + 1).padStart(2, '0'),
-    String(now.getDate()).padStart(2, '0')
-  ].join('-');
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+
+  return `${year}-${month}-${day}`;
 }
 
 
 function getDailyState() {
-
-  const today = getTodayKey();
-
-  let saved = null;
+  const key = `dailyChecklist_${getTodayKey()}`;
 
   try {
-    saved = JSON.parse(
-      localStorage.getItem('dailyJobSearch') || 'null'
-    );
-  } catch (e) {
-    saved = null;
+    return JSON.parse(localStorage.getItem(key) || '{}');
+  } catch (error) {
+    return {};
   }
-
-  if (!saved || saved.date !== today) {
-
-    const freshState = {
-      date: today,
-      completed: {}
-    };
-
-    localStorage.setItem(
-      'dailyJobSearch',
-      JSON.stringify(freshState)
-    );
-
-    return freshState;
-  }
-
-  return saved;
 }
 
 
 function saveDailyState(state) {
-
-  localStorage.setItem(
-    'dailyJobSearch',
-    JSON.stringify(state)
-  );
+  const key = `dailyChecklist_${getTodayKey()}`;
+  localStorage.setItem(key, JSON.stringify(state));
 }
 
 
 function renderDailyChecklist() {
+  const container = document.getElementById('dailyChecklist');
 
-  const container =
-    document.getElementById('dailyChecklist');
-
-  if (!container) return;
+  if (!container) {
+    console.warn('dailyChecklist element not found');
+    return;
+  }
 
   const state = getDailyState();
 
-  container.innerHTML = DAILY_CHECKLIST.map(item => {
-
-    const checked =
-      state.completed[item.id] === true;
-
-    const action =
-      item.url
-        ? `onclick="openJobSource('${item.id}')"`
-        : '';
+  container.innerHTML = DAILY_CHECKLIST.map((item, index) => {
+    const checked = !!state[item.id];
 
     return `
-      <label class="daily-check-item ${checked ? 'completed' : ''}">
+      <div class="daily-check-item ${checked ? 'completed' : ''}">
+        
+        <label class="check-label">
+          <input
+            type="checkbox"
+            ${checked ? 'checked' : ''}
+            onchange="toggleDailyItem('${item.id}')"
+          >
 
-        <input
-          type="checkbox"
-          ${checked ? 'checked' : ''}
-          onchange="toggleDailyItem('${item.id}')"
-        >
+          <span>
+            <strong>${index + 1}. ${item.label}</strong>
+            <small>${item.description}</small>
+          </span>
+        </label>
 
-        <span
-          class="check-label"
-          ${action}
-        >
+        ${
+          item.url
+            ? `<button
+                 class="check-action"
+                 onclick="openJobSource('${item.url}')"
+               >Open</button>`
+            : ''
+        }
 
-          <strong>${item.label}</strong>
-
-          <br>
-
-          <small class="check-action">
-            ${item.description}
-          </small>
-
-        </span>
-
-      </label>
+      </div>
     `;
-
   }).join('');
 
   updateDailyProgress();
@@ -974,11 +970,9 @@ function renderDailyChecklist() {
 
 
 function toggleDailyItem(id) {
-
   const state = getDailyState();
 
-  state.completed[id] =
-    !state.completed[id];
+  state[id] = !state[id];
 
   saveDailyState(state);
 
@@ -987,152 +981,99 @@ function toggleDailyItem(id) {
 
 
 function updateDailyProgress() {
-
   const state = getDailyState();
 
-  const completed =
-    Object.values(state.completed)
-      .filter(Boolean).length;
+  const completed = DAILY_CHECKLIST.filter(item => state[item.id]).length;
+  const total = DAILY_CHECKLIST.length;
+  const percentage = total ? (completed / total) * 100 : 0;
 
-  const total =
-    DAILY_CHECKLIST.length;
-
-  const percentage =
-    total === 0
-      ? 0
-      : Math.round(
-          completed / total * 100
-        );
-
-  const text =
-    document.getElementById(
-      'dailyProgressText'
-    );
-
-  const bar =
-    document.getElementById(
-      'dailyProgressBar'
-    );
+  const text = document.getElementById('dailyProgressText');
+  const bar = document.getElementById('dailyProgressBar');
 
   if (text) {
-    text.textContent =
-      `${completed} / ${total}`;
+    text.textContent = `${completed} / ${total}`;
   }
 
   if (bar) {
-    bar.style.width =
-      `${percentage}%`;
-  }
-
-  const dateElement =
-    document.getElementById('todayDate');
-
-  if (dateElement) {
-
-    dateElement.textContent =
-      new Date().toLocaleDateString(
-        'en-GB',
-        {
-          weekday: 'long',
-          day: 'numeric',
-          month: 'long',
-          year: 'numeric'
-        }
-      );
+    bar.style.width = `${percentage}%`;
   }
 }
 
 
-function openJobSource(id) {
+function openJobSource(url) {
+  if (!url) return;
 
-  const item =
-    DAILY_CHECKLIST.find(
-      x => x.id === id
-    );
-
-  if (!item || !item.url) return;
-
-  window.open(
-    item.url,
-    '_blank',
-    'noopener,noreferrer'
-  );
+  window.open(url, '_blank', 'noopener,noreferrer');
 }
 
 
-/* =========================================
+/* =========================================================
    JOB SEARCH SOURCES
-   ========================================= */
+   ========================================================= */
 
 const JOB_SOURCES = [
-
   {
     name: 'LinkedIn Jobs',
-    description: 'Jobs + saved alerts',
+    description: 'Corporate, scientific, editorial and project roles.',
     url: 'https://www.linkedin.com/jobs/'
   },
-
   {
-    name: 'Indeed',
-    description: 'Netherlands job search',
+    name: 'Indeed Netherlands',
+    description: 'Broad Netherlands job search.',
     url: 'https://nl.indeed.com/'
   },
-
   {
     name: 'AcademicTransfer',
-    description: 'Academic & research',
+    description: 'Dutch universities and research institutes.',
     url: 'https://www.academictransfer.com/'
   },
-
   {
     name: 'EURAXESS',
-    description: 'European research jobs',
+    description: 'European research and science vacancies.',
     url: 'https://euraxess.ec.europa.eu/jobs/search'
   },
-
   {
     name: 'Google Jobs',
-    description: 'Broader job search',
+    description: 'Broad search across company career pages.',
     url: 'https://www.google.com/search?q=jobs+Netherlands'
   }
-
 ];
 
 
 function renderJobSources() {
+  const container = document.getElementById('jobSources');
 
-  const container =
-    document.getElementById('jobSources');
+  if (!container) {
+    console.warn('jobSources element not found');
+    return;
+  }
 
-  if (!container) return;
+  container.innerHTML = JOB_SOURCES.map(source => `
+    <div class="job-source-card">
 
-  container.innerHTML =
-    JOB_SOURCES.map(source => `
+      <div class="job-source-name">
+        ${source.name}
+      </div>
 
-      <a
-        class="job-source-card"
-        href="${source.url}"
-        target="_blank"
-        rel="noopener noreferrer"
+      <div class="job-source-description">
+        ${source.description}
+      </div>
+
+      <button
+        class="small-button"
+        onclick="openJobSource('${source.url}')"
       >
+        Open jobs
+      </button>
 
-        <div class="job-source-name">
-          ${source.name}
-        </div>
-
-        <div class="job-source-description">
-          ${source.description}
-        </div>
-
-      </a>
-
-    `).join('');
+    </div>
+  `).join('');
 }
 
 
-/* =========================================
-   START NEW DASHBOARD
-   ========================================= */
+/* =========================================================
+   INITIALISE DAILY DASHBOARD
+   ========================================================= */
 
 renderDailyChecklist();
 renderJobSources();
