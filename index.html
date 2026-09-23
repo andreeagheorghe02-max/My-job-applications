@@ -499,8 +499,11 @@ button:hover {
 </thead>
       <tbody id="tableBody"></tbody>
     </table>
-    <div id="emptyState" class="empty" style="display:none;">No applications yet &mdash; add your first one!</div>
-       <div id="tableExpander" class="table-expander" style="display:none;"></div>
+    <div id="emptyState" class="empty" style="display:none;">
+  No applications yet &mdash; add your first one!
+</div>
+
+<div id="tableExpander" class="table-expander" style="display:none;"></div>
   </div>
 </div>
 
@@ -778,19 +781,19 @@ function renderTable() {
   }).join('');
 
   if (allFiltered.length > 10) {
-    expander.style.display = 'flex';
+  expander.style.display = 'flex';
 
-    expander.innerHTML = `
-      <button type="button" onclick="toggleApplicationsExpanded()">
-        ${applicationsExpanded
-          ? '− Show fewer applications'
-          : `+ Show all applications (${allFiltered.length})`}
-      </button>
-    `;
-   } else {
-    expander.style.display = 'none';
-    expander.innerHTML = '';
-  }
+  expander.innerHTML = `
+    <button type="button" onclick="toggleApplicationsExpanded()">
+      ${applicationsExpanded
+        ? '− Show fewer applications'
+        : `+ Show all applications (${allFiltered.length})`}
+    </button>
+  `;
+} else {
+  expander.style.display = 'none';
+  expander.innerHTML = '';
+}
 }
 
 function toggleApplicationsExpanded() {
