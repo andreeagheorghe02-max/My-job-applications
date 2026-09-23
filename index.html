@@ -821,13 +821,20 @@ function toggleAction(id, checked) {
   localStorage.setItem('actionsDismissed', JSON.stringify(actionsDismissed));
   renderActions();
 }
-  function deleteApp(id) {
+ function deleteApp(id) {
   const a = apps.find(x => x.id === id);
   if (!a) return;
+
   if (!confirm(`Delete application for "${a.role}" at ${a.company}?`)) return;
+
   apps = apps.filter(x => x.id !== id);
-  save(); closeModal(); render();
-   /* =========================================================
+  save();
+  closeModal();
+  render();
+}
+
+
+/* =========================================================
    DAILY JOB SEARCH DASHBOARD
    ========================================================= */
 
@@ -938,7 +945,6 @@ function renderDailyChecklist() {
 
     return `
       <div class="daily-check-item ${checked ? 'completed' : ''}">
-        
         <label class="check-label">
           <input
             type="checkbox"
@@ -960,7 +966,6 @@ function renderDailyChecklist() {
                >Open</button>`
             : ''
         }
-
       </div>
     `;
   }).join('');
@@ -975,7 +980,6 @@ function toggleDailyItem(id) {
   state[id] = !state[id];
 
   saveDailyState(state);
-
   renderDailyChecklist();
 }
 
@@ -1050,7 +1054,6 @@ function renderJobSources() {
 
   container.innerHTML = JOB_SOURCES.map(source => `
     <div class="job-source-card">
-
       <div class="job-source-name">
         ${source.name}
       </div>
@@ -1065,7 +1068,6 @@ function renderJobSources() {
       >
         Open jobs
       </button>
-
     </div>
   `).join('');
 }
@@ -1077,5 +1079,5 @@ function renderJobSources() {
 
 renderDailyChecklist();
 renderJobSources();
-}
+
 </script>
