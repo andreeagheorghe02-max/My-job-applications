@@ -132,14 +132,21 @@ button:hover {
   text-align: right;
 }
 
-.daily-progress-wrap strong {
-  font-size: 13px;
-}
-
 .progress-bar {
   width: 160px;
   height: 7px;
-  margin-top: 6
+  margin-top: 6px;
+  background: #e9e9e9;
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  width: 0%;
+  height: 100%;
+  background: #333;
+  transition: width 0.3s ease;
+}
  /* Daily checklist items */
 
 .daily-checklist {
@@ -690,7 +697,7 @@ function openModal(id) {
     document.getElementById('fDeadline').value = a.deadline || '';
     document.getElementById('fConfirmation').value = a.confirmation || '';
     document.getElementById('fJobLink').value = a.jobLink || '';
-    document.getElementById('fNotes').value = a.notes || ' ';
+ document.getElementById('fNotes').value = a.notes || '';
   } else {
     document.getElementById('fCompany').value = '';
     document.getElementById('fRole').value = '';
@@ -703,7 +710,7 @@ function openModal(id) {
     document.getElementById('fDeadline').value = '';
     document.getElementById('fConfirmation').value = '';
     document.getElementById('fJobLink').value = '';
-    document.getElementById('fNotes').value = ' ';
+    document.getElementById('fNotes').value = '';
   }
   document.getElementById('modalBg').classList.add('open');
 document.getElementById('btnDelete').style.display = id ? 'inline-block' : 'none';
@@ -798,5 +805,336 @@ function toggleAction(id, checked) {
   if (!confirm(`Delete application for "${a.role}" at ${a.company}?`)) return;
   apps = apps.filter(x => x.id !== id);
   save(); closeModal(); render();
+   /* =========================================
+   DAILY JOB SEARCH DASHBOARD
+   ========================================= */
+
+const DAILY_CHECKLIST = [
+  {
+    id: 'linkedin',
+    label: 'Check LinkedIn Jobs',
+    description: 'Search new jobs and saved alerts',
+    url: 'https://www.linkedin.com/jobs/'
+  },
+  {
+    id: 'indeed',
+    label: 'Check Indeed',
+    description: 'Search newly posted Netherlands jobs',
+    url: 'https://nl.indeed.com/'
+  },
+  {
+    id: 'academictransfer',
+    label: 'Check AcademicTransfer',
+    description: 'Academic, research and science roles',
+    url: 'https://www.academictransfer.com/'
+  },
+  {
+    id: 'euraxess',
+    label: 'Check EURAXESS',
+    description: 'Research and scientific positions',
+    url: 'https://euraxess.ec.europa.eu/jobs/search'
+  },
+  {
+    id: 'googlejobs',
+    label: 'Check Google Jobs',
+    description: 'Broader search across job sites',
+    url: 'https://www.google.com/search?q=jobs+Netherlands'
+  },
+  {
+    id: 'companies',
+    label: 'Check companies due today',
+    description: 'Review your company watchlist'
+  },
+  {
+    id: 'saved',
+    label: 'Review saved job alerts',
+    description: 'LinkedIn, Indeed and other alerts'
+  },
+  {
+    id: 'radar',
+    label: "Review 'On my radar'",
+    description: 'Decide what deserves an application'
+  },
+  {
+    id: 'followups',
+    label: 'Check application follow-ups',
+    description: 'Follow up on recent applications'
+  },
+  {
+    id: 'networking',
+    label: 'One networking action',
+    description: 'Message someone, connect or follow up'
+  }
+];
+
+
+function getTodayKey() {
+  const now = new Date();
+
+  return [
+    now.getFullYear(),
+    String(now.getMonth() + 1).padStart(2, '0'),
+    String(now.getDate()).padStart(2, '0')
+  ].join('-');
+}
+
+
+function getDailyState() {
+
+  const today = getTodayKey();
+
+  let saved = null;
+
+  try {
+    saved = JSON.parse(
+      localStorage.getItem('dailyJobSearch') || 'null'
+    );
+  } catch (e) {
+    saved = null;
+  }
+
+  if (!saved || saved.date !== today) {
+
+    const freshState = {
+      date: today,
+      completed: {}
+    };
+
+    localStorage.setItem(
+      'dailyJobSearch',
+      JSON.stringify(freshState)
+    );
+
+    return freshState;
+  }
+
+  return saved;
+}
+
+
+function saveDailyState(state) {
+
+  localStorage.setItem(
+    'dailyJobSearch',
+    JSON.stringify(state)
+  );
+}
+
+
+function renderDailyChecklist() {
+
+  const container =
+    document.getElementById('dailyChecklist');
+
+  if (!container) return;
+
+  const state = getDailyState();
+
+  container.innerHTML = DAILY_CHECKLIST.map(item => {
+
+    const checked =
+      state.completed[item.id] === true;
+
+    const action =
+      item.url
+        ? `onclick="openJobSource('${item.id}')"`
+        : '';
+
+    return `
+      <label class="daily-check-item ${checked ? 'completed' : ''}">
+
+        <input
+          type="checkbox"
+          ${checked ? 'checked' : ''}
+          onchange="toggleDailyItem('${item.id}')"
+        >
+
+        <span
+          class="check-label"
+          ${action}
+        >
+
+          <strong>${item.label}</strong>
+
+          <br>
+
+          <small class="check-action">
+            ${item.description}
+          </small>
+
+        </span>
+
+      </label>
+    `;
+
+  }).join('');
+
+  updateDailyProgress();
+}
+
+
+function toggleDailyItem(id) {
+
+  const state = getDailyState();
+
+  state.completed[id] =
+    !state.completed[id];
+
+  saveDailyState(state);
+
+  renderDailyChecklist();
+}
+
+
+function updateDailyProgress() {
+
+  const state = getDailyState();
+
+  const completed =
+    Object.values(state.completed)
+      .filter(Boolean).length;
+
+  const total =
+    DAILY_CHECKLIST.length;
+
+  const percentage =
+    total === 0
+      ? 0
+      : Math.round(
+          completed / total * 100
+        );
+
+  const text =
+    document.getElementById(
+      'dailyProgressText'
+    );
+
+  const bar =
+    document.getElementById(
+      'dailyProgressBar'
+    );
+
+  if (text) {
+    text.textContent =
+      `${completed} / ${total}`;
+  }
+
+  if (bar) {
+    bar.style.width =
+      `${percentage}%`;
+  }
+
+  const dateElement =
+    document.getElementById('todayDate');
+
+  if (dateElement) {
+
+    dateElement.textContent =
+      new Date().toLocaleDateString(
+        'en-GB',
+        {
+          weekday: 'long',
+          day: 'numeric',
+          month: 'long',
+          year: 'numeric'
+        }
+      );
+  }
+}
+
+
+function openJobSource(id) {
+
+  const item =
+    DAILY_CHECKLIST.find(
+      x => x.id === id
+    );
+
+  if (!item || !item.url) return;
+
+  window.open(
+    item.url,
+    '_blank',
+    'noopener,noreferrer'
+  );
+}
+
+
+/* =========================================
+   JOB SEARCH SOURCES
+   ========================================= */
+
+const JOB_SOURCES = [
+
+  {
+    name: 'LinkedIn Jobs',
+    description: 'Jobs + saved alerts',
+    url: 'https://www.linkedin.com/jobs/'
+  },
+
+  {
+    name: 'Indeed',
+    description: 'Netherlands job search',
+    url: 'https://nl.indeed.com/'
+  },
+
+  {
+    name: 'AcademicTransfer',
+    description: 'Academic & research',
+    url: 'https://www.academictransfer.com/'
+  },
+
+  {
+    name: 'EURAXESS',
+    description: 'European research jobs',
+    url: 'https://euraxess.ec.europa.eu/jobs/search'
+  },
+
+  {
+    name: 'Google Jobs',
+    description: 'Broader job search',
+    url: 'https://www.google.com/search?q=jobs+Netherlands'
+  }
+
+];
+
+
+function renderJobSources() {
+
+  const container =
+    document.getElementById('jobSources');
+
+  if (!container) return;
+
+  container.innerHTML =
+    JOB_SOURCES.map(source => `
+
+      <a
+        class="job-source-card"
+        href="${source.url}"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+
+        <div class="job-source-name">
+          ${source.name}
+        </div>
+
+        <div class="job-source-description">
+          ${source.description}
+        </div>
+
+      </a>
+
+    `).join('');
+}
+
+
+/* =========================================
+   START NEW DASHBOARD
+   ========================================= */
+
+renderDailyChecklist();
+renderJobSources();
 }
 </script>
