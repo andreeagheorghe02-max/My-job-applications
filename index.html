@@ -498,13 +498,12 @@ button:hover {
       type="button"
       onclick="toggleCompanyWatchlist()"
     >
-      View watchlist ▼
+      View watchlist
     </button>
   </div>
 
   <div id="companiesDueToday" class="company-list" hidden></div>
 </section>
-
 
 
   <!-- YOUR EXISTING METRICS -->
@@ -1375,7 +1374,12 @@ function markCompanyChecked(companyName) {
 
   saveCompanyCheckState(state);
 
-  renderCompaniesDueToday();
+  // Refresh the currently visible watchlist
+  const container = document.getElementById("companiesDueToday");
+
+  if (container && !container.hidden) {
+    showAllCompanies();
+  }
 }
 
 
@@ -1427,6 +1431,7 @@ function renderCompaniesDueToday() {
 
 
 // Show the complete company watchlist
+// Show the complete company watchlist
 function showAllCompanies() {
   const container = document.getElementById("companiesDueToday");
 
@@ -1442,8 +1447,9 @@ function showAllCompanies() {
         type="button"
         class="small-button"
         onclick="renderCompaniesDueToday()"
-      >Show due today</button>
-      
+      >
+        Show due today
+      </button>
     </div>
 
     ${COMPANY_WATCHLIST.map(company => {
@@ -1475,7 +1481,6 @@ function showAllCompanies() {
     }).join("")}
   `;
 }
-
 /* EXPAND / COLLAPSE COMPANY WATCHLIST */
 
 function toggleCompanyWatchlist() {
@@ -1484,13 +1489,15 @@ function toggleCompanyWatchlist() {
 
   if (!container || !button) return;
 
-  if (container.hidden) {
+  const isHidden = container.hidden;
+
+  if (isHidden) {
     showAllCompanies();
     container.hidden = false;
-    button.textContent = "Hide watchlist ▲";
+    button.textContent = "Hide watchlist";
   } else {
     container.hidden = true;
-    button.textContent = "View watchlist ▼";
+    button.textContent = "View watchlist";
   }
 }
 
