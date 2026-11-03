@@ -504,7 +504,7 @@ button:hover {
     </button>
   </div>
 
-  <div id="companiesDueToday" class="company-list" hidden></div>
+  <div id="companiesDueToday" class="company-list" style="display: none;"></div>
 </section>
 
 
@@ -1484,21 +1484,18 @@ function showAllCompanies() {
   `;
 }
 /* EXPAND / COLLAPSE COMPANY WATCHLIST */
-
 function toggleCompanyWatchlist() {
   const container = document.getElementById("companiesDueToday");
   const button = document.getElementById("viewWatchlistButton");
 
   if (!container || !button) return;
 
-  const isHidden = container.hidden;
-
-  if (isHidden) {
+  if (container.style.display === "none") {
     showAllCompanies();
-    container.hidden = false;
+    container.style.display = "flex";
     button.textContent = "Hide watchlist";
   } else {
-    container.hidden = true;
+    container.style.display = "none";
     button.textContent = "View watchlist";
   }
 }
