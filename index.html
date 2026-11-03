@@ -441,6 +441,200 @@ button:hover {
   flex-wrap: wrap;
 }
 
+/* =========================================
+   NEW DASHBOARD COLOUR REFRESH
+   ========================================= */
+
+/* Main background and typography */
+body {
+  background: #F1F3F2;
+}
+
+/* Dashboard section cards */
+.new-dashboard-section {
+  background: #FFFFFF;
+  border: 1px solid #E0E6E4;
+  border-radius: 14px;
+  box-shadow: 0 3px 12px rgba(35, 65, 60, 0.045);
+}
+
+/* Main headings */
+.new-dashboard-section h2,
+.top-bar h1 {
+  color: #294B55;
+}
+
+/* Section descriptions */
+.section-subtitle {
+  color: #71817F;
+}
+
+/* Progress bar */
+.progress-bar {
+  background: #E5EBE8;
+}
+
+.progress-fill {
+  background: #398779;
+}
+
+/* Dashboard buttons */
+.secondary-button,
+.small-button,
+.check-action {
+  background: #EAF1EF;
+  color: #315D70;
+  border: 1px solid #D8E5E0;
+  border-radius: 8px;
+}
+
+.secondary-button:hover,
+.small-button:hover,
+.check-action:hover {
+  background: #DCEAE5;
+  opacity: 1;
+}
+
+/* Watchlist and company cards */
+.company-row,
+.company-card,
+.daily-check-item,
+.job-source-card {
+  background: #FBFCFB;
+  border: 1px solid #E1E8E5;
+  border-radius: 10px;
+  transition: all 0.2s ease;
+}
+
+.company-row:hover,
+.company-card:hover,
+.daily-check-item:hover,
+.job-source-card:hover {
+  border-color: #8CB6A9;
+  box-shadow: 0 3px 10px rgba(49, 93, 112, 0.07);
+}
+
+/* Company names */
+.company-name,
+.company-card-info strong,
+.job-source-name {
+  color: #315D70;
+}
+
+/* Main action buttons */
+.btn-save,
+.filter-btn.active {
+  background: #315D70;
+  color: #FFFFFF;
+  border-color: #315D70;
+}
+
+.btn-save:hover,
+.filter-btn.active:hover {
+  background: #244958;
+}
+
+/* Table headers */
+th {
+  color: #58736F;
+  background: #F5F8F6;
+}
+
+/* Table row hover */
+tr:hover td {
+  background: #F0F5F3;
+}
+
+/* Status badges */
+.b-applied {
+  background: #E2EDF5;
+  color: #315D70;
+}
+
+.b-reply {
+  background: #E1F0E9;
+  color: #286B55;
+}
+
+.b-interview {
+  background: #F8EBDD;
+  color: #98602E;
+}
+
+.b-offer {
+  background: #DCEFE8;
+  color: #216B55;
+}
+
+.b-rejected {
+  background: #F6E3E3;
+  color: #963F42;
+}
+
+.b-ghosted {
+  background: #ECEAE5;
+  color: #68645D;
+}
+
+.b-closed {
+  background: #F1E5EC;
+  color: #80516A;
+}
+
+.b-radar {
+  background: #EAE5F4;
+  color: #69558F;
+}
+
+/* Daily checklist completed state */
+.daily-check-item.completed {
+  background: #F0F6F2;
+}
+
+/* Modal */
+.modal {
+  border: 1px solid #E0E6E4;
+  box-shadow: 0 12px 40px rgba(35, 65, 60, 0.16);
+}
+
+/* Table container */
+.table-wrap {
+  border: 1px solid #E0E6E4;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(35, 65, 60, 0.035);
+}
+
+/* Table expander */
+.table-expander {
+  background: #F7F9F8;
+}
+
+.table-expander button {
+  background: #EAF1EF;
+  color: #315D70;
+  border-color: #D8E5E0;
+}
+
+/* Input fields */
+.form-row input,
+.form-row select {
+  background: #F8FAF9;
+  border-color: #DCE5E1;
+}
+
+.form-row input:focus,
+.form-row select:focus {
+  outline: 2px solid #8CB6A9;
+  border-color: #398779;
+}
+
+/* Smooth transitions */
+.metric,
+.chart-card,
+.new-dashboard-section {
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
 </style>
 
 <div class="dash">
