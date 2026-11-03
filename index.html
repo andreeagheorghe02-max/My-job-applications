@@ -482,22 +482,29 @@ button:hover {
   </section>
 
 
-  <section class="new-dashboard-section">
-    <div class="section-header">
-      <div>
-        <h2>Companies to Check Today</h2>
-        <p class="section-subtitle">
-          Your watchlist tells you which companies are due for a search.
-        </p>
-      </div>
-
-      <button class="secondary-button" onclick="showAllCompanies()">
-        View watchlist
-      </button>
+ 
+<section class="new-dashboard-section">
+  <div class="section-header">
+    <div>
+      <h2>Companies to Check Today</h2>
+      <p class="section-subtitle">
+        Your watchlist tells you which companies are due for a search.
+      </p>
     </div>
 
-    <div id="companiesDueToday" class="company-list"></div>
-  </section>
+    <button
+      class="secondary-button"
+      id="viewWatchlistButton"
+      type="button"
+      onclick="toggleCompanyWatchlist()"
+    >
+      View watchlist ▼
+    </button>
+  </div>
+
+  <div id="companiesDueToday" class="company-list" hidden></div>
+</section>
+
 
 
   <!-- YOUR EXISTING METRICS -->
@@ -1436,6 +1443,7 @@ function showAllCompanies() {
         class="small-button"
         onclick="renderCompaniesDueToday()"
       >Show due today</button>
+      
     </div>
 
     ${COMPANY_WATCHLIST.map(company => {
@@ -1468,9 +1476,26 @@ function showAllCompanies() {
   `;
 }
 
+/* EXPAND / COLLAPSE COMPANY WATCHLIST */
+
+function toggleCompanyWatchlist() {
+  const container = document.getElementById("companiesDueToday");
+  const button = document.getElementById("viewWatchlistButton");
+
+  if (!container || !button) return;
+
+  if (container.hidden) {
+    showAllCompanies();
+    container.hidden = false;
+    button.textContent = "Hide watchlist ▲";
+  } else {
+    container.hidden = true;
+    button.textContent = "View watchlist ▼";
+  }
+}
+
 renderDailyChecklist();
 renderJobSources();
-renderCompaniesDueToday();
  
 
 </script>
