@@ -446,196 +446,359 @@ button:hover {
    ========================================= */
 
 /* Main background and typography */
+
+/* ==========================================
+   JOB DASHBOARD — COHESIVE VISUAL REFRESH
+   Replace the previous colour-refresh block
+   with this one. Keep your original CSS.
+   ========================================== */
+
+:root {
+  --dash-ink: #203C46;
+  --dash-muted: #71858A;
+  --dash-petrol: #245766;
+  --dash-petrol-dark: #194653;
+  --dash-teal: #319887;
+  --dash-teal-soft: #E3F1ED;
+  --dash-amber: #D69A42;
+  --dash-amber-soft: #FBF1DF;
+  --dash-purple: #82749E;
+  --dash-purple-soft: #F0ECF5;
+  --dash-page: #F1F5F4;
+  --dash-surface: #FFFFFF;
+  --dash-surface-soft: #F7FAF9;
+  --dash-line: #E2EAE7;
+}
+
+/* PAGE AND GENERAL TYPE */
+
 body {
-  background: #F1F3F2;
+  background:
+    radial-gradient(ellipse at 8% 0%, rgba(49,152,135,.09), transparent 34%),
+    radial-gradient(ellipse at 95% 12%, rgba(130,116,158,.07), transparent 30%),
+    var(--dash-page) !important;
+  color: var(--dash-ink);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
-/* Dashboard section cards */
-.new-dashboard-section {
-  background: #FFFFFF;
-  border: 1px solid #E0E6E4;
-  border-radius: 14px;
-  box-shadow: 0 3px 12px rgba(35, 65, 60, 0.045);
+.top-bar {
+  margin-bottom: 28px;
 }
 
-/* Main headings */
-.new-dashboard-section h2,
 .top-bar h1 {
-  color: #294B55;
+  color: var(--dash-petrol-dark) !important;
+  font-size: clamp(26px, 3vw, 34px);
+  font-weight: 750;
+  letter-spacing: -1.1px;
 }
 
-/* Section descriptions */
+/* SECTION HEADINGS */
+
+.new-dashboard-section {
+  background: rgba(255,255,255,.88) !important;
+  border: 1px solid rgba(215,229,224,.85) !important;
+  border-radius: 18px !important;
+  box-shadow: 0 5px 20px rgba(35,75,70,.045) !important;
+  padding: 24px !important;
+  margin-bottom: 22px;
+}
+
+.new-dashboard-section h2 {
+  color: var(--dash-petrol-dark) !important;
+  font-size: 19px;
+  font-weight: 720;
+  letter-spacing: -.35px;
+}
+
 .section-subtitle {
-  color: #71817F;
+  color: var(--dash-muted) !important;
+  line-height: 1.55;
 }
 
-/* Progress bar */
+/* DAILY CHECKLIST */
+
+.daily-checklist {
+  gap: 9px;
+}
+
+.daily-check-item {
+  background: var(--dash-surface-soft) !important;
+  border: 1px solid #E7EEEB !important;
+  border-radius: 12px !important;
+  padding: 12px 14px !important;
+  transition: background .18s ease, border-color .18s ease, transform .18s ease;
+}
+
+.daily-check-item:hover {
+  background: #EFF7F4 !important;
+  border-color: #C9DFD8 !important;
+  transform: translateY(-1px);
+}
+
 .progress-bar {
-  background: #E5EBE8;
+  background: #DFEAE6 !important;
+  border-radius: 99px;
+  overflow: hidden;
 }
 
 .progress-fill {
-  background: #398779;
+  background: linear-gradient(90deg, #287B79, #45AA91) !important;
+  border-radius: 99px;
 }
 
-/* Dashboard buttons */
+/* JOB SEARCH SOURCE CARDS */
+
+.job-sources-grid {
+  gap: 14px;
+}
+
+.job-source-card {
+  background: linear-gradient(145deg, #FFFFFF, #F5F9F7) !important;
+  border: 1px solid #DFEAE5 !important;
+  border-radius: 15px !important;
+  padding: 17px !important;
+  transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+}
+
+.job-source-card:hover {
+  transform: translateY(-3px);
+  border-color: #BBD8CF !important;
+  box-shadow: 0 8px 20px rgba(36,87,102,.08);
+}
+
+.job-source-card a {
+  color: var(--dash-teal) !important;
+  font-weight: 650;
+}
+
+/* COMPANY WATCHLIST */
+
+.company-row,
+.company-card {
+  background: #F8FAF9 !important;
+  border: 1px solid #E5ECE9 !important;
+  border-radius: 12px !important;
+  transition: background .18s ease, border-color .18s ease;
+}
+
+.company-row:hover,
+.company-card:hover {
+  background: #F0F7F4 !important;
+  border-color: #C9DED6 !important;
+}
+
+.watchlist-heading {
+  color: var(--dash-petrol) !important;
+}
+
+/* STAT NUMBERS */
+
+.metric {
+  background: linear-gradient(145deg, #FFFFFF, #F7FAF9) !important;
+  border: 1px solid #E1EAE6 !important;
+  border-radius: 16px !important;
+  box-shadow: 0 3px 12px rgba(35,75,70,.035) !important;
+  padding: 19px !important;
+}
+
+.metric h3,
+.metric .label {
+  color: var(--dash-muted) !important;
+}
+
+.metric .value,
+.metric strong {
+  color: var(--dash-petrol-dark);
+  font-weight: 750;
+  letter-spacing: -1px;
+}
+
+/* CHART PANELS */
+
+.chart-card {
+  background: #FBFCFB !important;
+  border: 1px solid #E5ECE9 !important;
+  border-radius: 15px !important;
+  box-shadow: none !important;
+  padding: 18px !important;
+}
+
+.charts {
+  gap: 16px;
+}
+
+/* FILTERS */
+
+.filter-btn {
+  background: #F0F5F3 !important;
+  color: #587078 !important;
+  border: 1px solid #E0E9E5 !important;
+  border-radius: 999px !important;
+  padding: 8px 14px !important;
+  transition: all .18s ease;
+}
+
+.filter-btn:hover {
+  background: #E2F0EB !important;
+  color: var(--dash-petrol-dark) !important;
+  border-color: #C4DCD3 !important;
+}
+
+.filter-btn.active,
+.filter-btn[aria-pressed="true"] {
+  background: var(--dash-petrol) !important;
+  color: #FFFFFF !important;
+  border-color: var(--dash-petrol) !important;
+}
+
+/* BUTTONS */
+
+.add-btn {
+  background: var(--dash-petrol) !important;
+  color: #FFFFFF !important;
+  border: 1px solid var(--dash-petrol) !important;
+  border-radius: 999px !important;
+  padding: 10px 18px !important;
+  font-weight: 650;
+  box-shadow: 0 4px 10px rgba(36,87,102,.15);
+  transition: background .18s ease, transform .18s ease;
+}
+
+.add-btn:hover {
+  background: var(--dash-petrol-dark) !important;
+  transform: translateY(-1px);
+}
+
 .secondary-button,
 .small-button,
 .check-action {
-  background: #EAF1EF;
-  color: #315D70;
-  border: 1px solid #D8E5E0;
-  border-radius: 8px;
+  background: var(--dash-teal-soft) !important;
+  color: #286D66 !important;
+  border: 1px solid #D2E7DF !important;
+  border-radius: 999px !important;
+  transition: background .18s ease;
 }
 
 .secondary-button:hover,
 .small-button:hover,
 .check-action:hover {
-  background: #DCEAE5;
-  opacity: 1;
+  background: #D5EAE2 !important;
 }
 
-/* Watchlist and company cards */
-.company-row,
-.company-card,
-.daily-check-item,
-.job-source-card {
-  background: #FBFCFB;
-  border: 1px solid #E1E8E5;
-  border-radius: 10px;
-  transition: all 0.2s ease;
-}
+/* APPLICATION TABLE */
 
-.company-row:hover,
-.company-card:hover,
-.daily-check-item:hover,
-.job-source-card:hover {
-  border-color: #8CB6A9;
-  box-shadow: 0 3px 10px rgba(49, 93, 112, 0.07);
-}
-
-/* Company names */
-.company-name,
-.company-card-info strong,
-.job-source-name {
-  color: #315D70;
-}
-
-/* Main action buttons */
-.btn-save,
-.filter-btn.active {
-  background: #315D70;
-  color: #FFFFFF;
-  border-color: #315D70;
-}
-
-.btn-save:hover,
-.filter-btn.active:hover {
-  background: #244958;
-}
-
-/* Table headers */
-th {
-  color: #58736F;
-  background: #F5F8F6;
-}
-
-/* Table row hover */
-tr:hover td {
-  background: #F0F5F3;
-}
-
-/* Status badges */
-.b-applied {
-  background: #E2EDF5;
-  color: #315D70;
-}
-
-.b-reply {
-  background: #E1F0E9;
-  color: #286B55;
-}
-
-.b-interview {
-  background: #F8EBDD;
-  color: #98602E;
-}
-
-.b-offer {
-  background: #DCEFE8;
-  color: #216B55;
-}
-
-.b-rejected {
-  background: #F6E3E3;
-  color: #963F42;
-}
-
-.b-ghosted {
-  background: #ECEAE5;
-  color: #68645D;
-}
-
-.b-closed {
-  background: #F1E5EC;
-  color: #80516A;
-}
-
-.b-radar {
-  background: #EAE5F4;
-  color: #69558F;
-}
-
-/* Daily checklist completed state */
-.daily-check-item.completed {
-  background: #F0F6F2;
-}
-
-/* Modal */
-.modal {
-  border: 1px solid #E0E6E4;
-  box-shadow: 0 12px 40px rgba(35, 65, 60, 0.16);
-}
-
-/* Table container */
 .table-wrap {
-  border: 1px solid #E0E6E4;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(35, 65, 60, 0.035);
+  border: 1px solid #E2EAE7 !important;
+  border-radius: 14px !important;
+  overflow-x: auto;
+  background: #FFFFFF;
 }
 
-/* Table expander */
-.table-expander {
-  background: #F7F9F8;
+table {
+  border-collapse: separate;
+  border-spacing: 0;
 }
 
-.table-expander button {
-  background: #EAF1EF;
-  color: #315D70;
-  border-color: #D8E5E0;
+thead th {
+  background: #EFF5F2 !important;
+  color: #4D6970 !important;
+  font-size: 11px;
+  font-weight: 750;
+  letter-spacing: .055em;
+  text-transform: uppercase;
+  border-bottom: 1px solid #DDE8E3 !important;
 }
 
-/* Input fields */
-.form-row input,
-.form-row select {
-  background: #F8FAF9;
-  border-color: #DCE5E1;
+tbody tr {
+  transition: background .15s ease;
 }
 
-.form-row input:focus,
-.form-row select:focus {
-  outline: 2px solid #8CB6A9;
-  border-color: #398779;
+tbody tr:nth-child(even) {
+  background: #FAFCFB;
 }
 
-/* Smooth transitions */
-.metric,
-.chart-card,
-.new-dashboard-section {
-  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+tbody tr:hover {
+  background: #EFF7F4 !important;
 }
 
-</style>
+td, th {
+  border-color: #E9EFEC !important;
+}
+
+td {
+  color: #344F57;
+}
+
+/* STATUS BADGES — keep the text labels intact */
+
+.badge {
+  border-radius: 999px !important;
+  font-weight: 650;
+  padding: 4px 9px !important;
+}
+
+/* NEXT ACTIONS — subtle warm highlight */
+
+.new-dashboard-section .company-row:has(.deadline),
+.new-dashboard-section .company-card:has(.deadline) {
+  border-left: 3px solid var(--dash-amber) !important;
+}
+
+/* FORMS AND MODALS — visual styling only */
+
+input,
+select,
+textarea {
+  border-color: #D8E4DF !important;
+  border-radius: 9px !important;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--dash-teal) !important;
+  box-shadow: 0 0 0 3px rgba(49,152,135,.13) !important;
+}
+
+.modal {
+  border-radius: 18px !important;
+}
+
+/* KEYBOARD ACCESSIBILITY */
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid rgba(49,152,135,.35);
+  outline-offset: 2px;
+}
+
+/* SMALL SCREENS */
+
+@media (max-width: 700px) {
+  .new-dashboard-section {
+    padding: 17px !important;
+    border-radius: 15px !important;
+    margin-bottom: 16px;
+  }
+
+  .top-bar {
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .metric {
+    padding: 15px !important;
+  }
+
+  .job-source-card {
+    padding: 14px !important;
+  }
+}
+
 
 <div class="dash">
   <div class="top-bar">
