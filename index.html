@@ -1190,6 +1190,234 @@ function renderJobSources() {
    INITIALISE DAILY DASHBOARD
    ========================================================= */
 
+/* =========================================================
+   COMPANY WATCHLIST
+   ========================================================= */
+
+const COMPANY_WATCHLIST = [
+  {
+    name: "Paebbl",
+    url: "https://careers.paebbl.com/jobs/7895942-forward-deployed-engineer"
+  },
+  {
+    name: "Eurofins",
+    url: "https://careers.eurofins.com/nl/legacyjobs?countryId=nl"
+  },
+  {
+    name: "TIO FARMA",
+    url: "https://www.google.com/search?q=TIO+FARMA+careers+jobs"
+  },
+  {
+    name: "Genmab",
+    url: "https://careers.genmab.com/global/en"
+  },
+  {
+    name: "Novartis",
+    url: "https://www.novartis.com/careers"
+  },
+  {
+    name: "PPG",
+    url: "https://www.ppg.com/en-US/about-ppg/careers-at-ppg"
+  },
+  {
+    name: "Givaudan",
+    url: "https://careers.givaudan.com/global/en/search-results?s=1"
+  },
+  {
+    name: "AstraZeneca",
+    url: "https://careers.astrazeneca.com/search-jobs/Baarn%2C%20Utrecht%2C%20Netherlands/7684/4/2750405-2745909-2759543-2759544/52x21167/5x2875/100/2"
+  },
+  {
+    name: "Thermo Fisher Scientific",
+    url: "https://jobs.thermofisher.com/global/en/search-results?from=60&s=1"
+  },
+  {
+    name: "Siemens Energy",
+    url: "https://jobs.siemens-energy.com/en_US/jobs/Jobs/?29454=964496&29454_format=11381&listFilterMode=1&folderRecordsPerPage=20"
+  },
+  {
+    name: "Glencore",
+    url: "https://www.glencore.com/en/careers/jobs"
+  },
+  {
+    name: "Applied Medical",
+    url: "https://careers.appliedmedical.com/jobs?country=Netherlands&page=1&limit=100"
+  },
+  {
+    name: "NORIT",
+    url: "https://apply.workable.com/norit/#jobs"
+  },
+  {
+    name: "Anton Paar Netherlands",
+    url: "https://www.linkedin.com/company/anton-paar-netherlands/jobs/"
+  },
+  {
+    name: "IFF",
+    url: "https://www.google.com/search?q=IFF+careers+Netherlands"
+  },
+  {
+    name: "AkzoNobel",
+    url: "https://www.google.com/search?q=AkzoNobel+careers+Netherlands"
+  },
+  {
+    name: "Shell",
+    url: "https://www.shell.com/careers.html"
+  },
+  {
+    name: "Merck",
+    url: "https://careers.merckgroup.com/"
+  },
+  {
+    name: "Johnson & Johnson",
+    url: "https://www.careers.jnj.com/"
+  },
+  {
+    name: "GSK",
+    url: "https://www.gsk.com/en-gb/careers/"
+  },
+  {
+    name: "Wageningen University & Research",
+    url: "https://www.wur.nl/en/vacancies.htm"
+  }
+];
+
+
+// Read company check history
+function getCompanyCheckState() {
+  try {
+    return JSON.parse(
+      localStorage.getItem("companyWatchlistChecks") || "{}"
+    );
+  } catch (error) {
+    return {};
+  }
+}
+
+
+// Save company check history
+function saveCompanyCheckState(state) {
+  localStorage.setItem(
+    "companyWatchlistChecks",
+    JSON.stringify(state)
+  );
+}
+
+
+// Check whether a company has been checked today
+function isCompanyDue(company) {
+  const state = getCompanyCheckState();
+  return state[company.name] !== getTodayKey();
+}
+
+
+// Mark a company as checked today
+function markCompanyChecked(companyName) {
+  const state = getCompanyCheckState();
+
+  state[companyName] = getTodayKey();
+
+  saveCompanyCheckState(state);
+
+  renderCompaniesDueToday();
+}
+
+
+// Render companies due today
+function renderCompaniesDueToday() {
+  const container = document.getElementById("companiesDueToday");
+
+  if (!container) return;
+
+  const dueCompanies = COMPANY_WATCHLIST.filter(isCompanyDue);
+
+  if (dueCompanies.length === 0) {
+    container.innerHTML = `
+      <p class="company-empty">
+        All companies checked today. Great work!
+      </p>
+    `;
+    return;
+  }
+
+  container.innerHTML = `
+    <p><strong>${dueCompanies.length}</strong> companies to check today</p>
+
+    ${dueCompanies.map(company => `
+      <div class="company-card">
+        <div class="company-card-info">
+          <strong>${company.name}</strong>
+          <span>Due for a job search</span>
+        </div>
+
+        <div class="company-card-actions">
+          <a
+            href="${company.url}"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="small-button"
+          >Open careers</a>
+
+          <button
+            type="button"
+            class="small-button"
+            onclick="markCompanyChecked(${JSON.stringify(company.name)})"
+          >Mark checked</button>
+        </div>
+      </div>
+    `).join("")}
+  `;
+}
+
+
+// Show the complete company watchlist
+function showAllCompanies() {
+  const container = document.getElementById("companiesDueToday");
+
+  if (!container) return;
+
+  const state = getCompanyCheckState();
+
+  container.innerHTML = `
+    <div class="watchlist-heading">
+      <strong>Complete company watchlist (${COMPANY_WATCHLIST.length})</strong>
+
+      <button
+        type="button"
+        class="small-button"
+        onclick="renderCompaniesDueToday()"
+      >Show due today</button>
+    </div>
+
+    ${COMPANY_WATCHLIST.map(company => {
+      const checkedToday = state[company.name] === getTodayKey();
+
+      return `
+        <div class="company-card">
+          <div class="company-card-info">
+            <strong>${company.name}</strong>
+            <span>${checkedToday ? "Checked today" : "Not checked today"}</span>
+          </div>
+
+          <div class="company-card-actions">
+            <a
+              href="${company.url}"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="small-button"
+            >Open careers</a>
+
+            <button
+              type="button"
+              class="small-button"
+              onclick="markCompanyChecked(${JSON.stringify(company.name)})"
+            >Mark checked</button>
+          </div>
+        </div>
+      `;
+    }).join("")}
+  `;
+}
+
 renderDailyChecklist();
 renderJobSources();
 
