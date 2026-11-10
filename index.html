@@ -801,16 +801,15 @@ textarea:focus-visible {
 </style>
 
 <div class="dash">
-  <div class="top-bar">
-      <h1>My Job Applications</h1>
-<div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
-  <button class="secondary-button" type="button" onclick="exportApps()">Export backup</button>
-  <button class="secondary-button" type="button" onclick="document.getElementById('importFile').click()">Import backup</button>
-  <input type="file" id="importFile" accept=".json,application/json" style="display:none" onchange="importApps(event)">
-  <button class="add-btn" onclick="openModal()">+ Add application</button>
+<div class="top-bar">
+  <h1>My Job Applications</h1>
+  <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+    <button class="secondary-button" type="button" onclick="exportApps()">Export backup</button>
+    <button class="secondary-button" type="button" onclick="document.getElementById('importFile').click()">Import backup</button>
+    <input type="file" id="importFile" accept=".json,application/json" style="display:none" onchange="importApps(event)">
+    <button class="add-btn" onclick="openModal()">+ Add application</button>
+  </div>
 </div>
-</div>
-
   <!-- NEW JOB SEARCH DASHBOARD -->
 
   <section class="new-dashboard-section">
