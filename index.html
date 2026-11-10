@@ -803,8 +803,13 @@ textarea:focus-visible {
 <div class="dash">
   <div class="top-bar">
       <h1>My Job Applications</h1>
-    <button class="add-btn" onclick="openModal()">+ Add application</button>
-  </div>
+<div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+  <button class="secondary-button" type="button" onclick="exportApps()">Export backup</button>
+  <button class="secondary-button" type="button" onclick="document.getElementById('importFile').click()">Import backup</button>
+  <input type="file" id="importFile" accept=".json,application/json" style="display:none" onchange="importApps(event)">
+  <button class="add-btn" onclick="openModal()">+ Add application</button>
+</div>
+</div>
 
   <!-- NEW JOB SEARCH DASHBOARD -->
 
@@ -1896,7 +1901,39 @@ function toggleCompanyWatchlist() {
     button.textContent = "View watchlist";
   }
 }
+function exportApps() {
+  const data = JSON.stringify(apps, null, 2);
+  const blob = new Blob([data], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'job-applications-backup-' + getTodayKey() + '.json';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
 
+function importApps(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const imported = JSON.parse(reader.result);
+      if (!Array.isArray(imported)) throw new Error('This is not a list of applications');
+      if (!confirm('Replace your current ' + apps.length + ' applications with the ' + imported.length + ' in this backup?')) return;
+      apps = imported;
+      save();
+      render();
+    } catch (err) {
+      alert('Could not import this file: ' + err.message);
+    } finally {
+      event.target.value = '';
+    }
+  };
+  reader.readAsText(file);
+}
 renderDailyChecklist();
 renderJobSources();
  
